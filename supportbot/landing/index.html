@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SupportBot — AI Customer Support, Running 24/7</title>
+  <meta name="description" content="Deploy a fully trained AI support bot on your website in minutes. Handles customer questions 24/7, learns from your docs, never takes a day off." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --blue: #2563EB;
+      --blue-dark: #1d4ed8;
+      --blue-light: #eff6ff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --bg: #ffffff;
+      --radius: 14px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'DM Sans', sans-serif; color: var(--text); background: var(--bg); line-height: 1.6; }
+
+    /* NAV */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 48px; height: 64px;
+      background: rgba(255,255,255,0.9); backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo { font-size: 18px; font-weight: 700; color: var(--blue); letter-spacing: -0.3px; }
+    .nav-links { display: flex; gap: 32px; }
+    .nav-links a { text-decoration: none; color: var(--muted); font-size: 14px; font-weight: 500; transition: color 0.15s; }
+    .nav-links a:hover { color: var(--text); }
+    .nav-cta { display: flex; gap: 10px; align-items: center; }
+    .btn { display: inline-flex; align-items: center; padding: 10px 22px; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.15s; text-decoration: none; border: none; font-family: inherit; }
+    .btn-primary { background: var(--blue); color: #fff; }
+    .btn-primary:hover { background: var(--blue-dark); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(37,99,235,0.3); }
+    .btn-ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
+    .btn-ghost:hover { background: #f8fafc; }
+    .btn-lg { padding: 14px 32px; font-size: 15px; border-radius: 12px; }
+
+    /* HERO */
+    .hero {
+      text-align: center; padding: 96px 24px 80px;
+      background: linear-gradient(180deg, #f0f7ff 0%, #fff 100%);
+      position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: ""; position: absolute; inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(37,99,235,0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--blue-light); color: var(--blue); border: 1px solid #bfdbfe;
+      border-radius: 20px; padding: 6px 16px; font-size: 13px; font-weight: 600;
+      margin-bottom: 28px;
+    }
+    .hero-badge span { width: 6px; height: 6px; background: var(--blue); border-radius: 50%; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+    h1 {
+      font-family: 'Instrument Serif', serif;
+      font-size: clamp(44px, 6vw, 72px); line-height: 1.08; letter-spacing: -1px;
+      color: var(--text); max-width: 800px; margin: 0 auto 20px;
+    }
+    h1 em { font-style: italic; color: var(--blue); }
+    .hero-sub { font-size: 18px; color: var(--muted); max-width: 520px; margin: 0 auto 36px; line-height: 1.7; }
+    .hero-ctas { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .hero-trust { margin-top: 48px; color: var(--muted); font-size: 13px; }
+    .hero-trust strong { color: var(--text); }
+
+    /* WIDGET PREVIEW */
+    .preview-wrap {
+      max-width: 900px; margin: 60px auto 0; padding: 0 24px;
+      position: relative;
+    }
+    .preview-browser {
+      background: #1e293b; border-radius: 16px; overflow: hidden;
+      box-shadow: 0 32px 80px rgba(0,0,0,0.2);
+    }
+    .preview-bar {
+      background: #334155; padding: 12px 16px; display: flex; gap: 6px; align-items: center;
+    }
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot-r { background: #ef4444; } .dot-y { background: #f59e0b; } .dot-g { background: #22c55e; }
+    .preview-url { flex: 1; background: #1e293b; border-radius: 6px; padding: 4px 12px; font-size: 12px; color: #94a3b8; margin: 0 12px; font-family: monospace; }
+    .preview-content {
+      height: 380px; background: #f8fafc; position: relative; overflow: hidden;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .preview-site { text-align: center; color: #94a3b8; font-size: 15px; }
+    .preview-site h3 { color: #475569; font-size: 24px; margin-bottom: 8px; }
+
+    /* Fake chat widget inside preview */
+    .fake-widget {
+      position: absolute; bottom: 20px; right: 20px;
+      width: 300px; background: #fff; border-radius: 14px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.15); overflow: hidden;
+      font-family: -apple-system, sans-serif;
+    }
+    .fw-header { background: var(--blue); padding: 12px 14px; color: #fff; }
+    .fw-header-row { display: flex; align-items: center; gap: 8px; }
+    .fw-avatar { width: 28px; height: 28px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+    .fw-header h4 { font-size: 13px; font-weight: 600; margin: 0; }
+    .fw-header p { font-size: 11px; opacity: 0.8; margin: 0; }
+    .fw-msgs { padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+    .fw-msg { font-size: 12px; line-height: 1.5; padding: 8px 10px; border-radius: 10px; max-width: 85%; }
+    .fw-msg.bot { background: #f1f5f9; color: #1e293b; align-self: flex-start; border-radius: 10px 10px 10px 2px; }
+    .fw-msg.user { background: var(--blue); color: #fff; align-self: flex-end; border-radius: 10px 10px 2px 10px; }
+    .fw-input { display: flex; border-top: 1px solid #e2e8f0; padding: 8px 10px; gap: 6px; align-items: center; }
+    .fw-input span { flex: 1; font-size: 12px; color: #94a3b8; }
+    .fw-send { width: 26px; height: 26px; background: var(--blue); border-radius: 6px; display: flex; align-items: center; justify-content: center; }
+    .fw-typing { display: flex; gap: 3px; align-items: center; padding: 2px 0; }
+    .fw-typing span { width: 5px; height: 5px; background: #94a3b8; border-radius: 50%; animation: bounce 1.2s infinite; }
+    .fw-typing span:nth-child(2) { animation-delay: 0.2s; }
+    .fw-typing span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes bounce { 0%,80%,100% { transform: translateY(0); } 40% { transform: translateY(-5px); } }
+
+    /* FEATURES */
+    section { padding: 96px 24px; }
+    .section-inner { max-width: 1100px; margin: 0 auto; }
+    .section-label { font-size: 13px; font-weight: 700; color: var(--blue); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; }
+    h2 { font-family: 'Instrument Serif', serif; font-size: clamp(32px, 4vw, 48px); line-height: 1.15; letter-spacing: -0.5px; margin-bottom: 16px; }
+    .section-sub { color: var(--muted); font-size: 17px; max-width: 540px; line-height: 1.7; margin-bottom: 56px; }
+
+    .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .feature-card { padding: 28px; border: 1px solid var(--border); border-radius: var(--radius); transition: box-shadow 0.2s, transform 0.2s; }
+    .feature-card:hover { box-shadow: 0 8px 32px rgba(0,0,0,0.08); transform: translateY(-3px); }
+    .feature-icon { width: 44px; height: 44px; background: var(--blue-light); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; margin-bottom: 16px; }
+    .feature-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+    .feature-card p { font-size: 14px; color: var(--muted); line-height: 1.6; }
+
+    /* HOW IT WORKS */
+    .hiw-bg { background: #f8fafc; }
+    .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; position: relative; }
+    .steps::before { content: ""; position: absolute; top: 28px; left: calc(12.5% + 20px); right: calc(12.5% + 20px); height: 2px; background: var(--border); z-index: 0; }
+    .step { text-align: center; padding: 0 16px; position: relative; z-index: 1; }
+    .step-num { width: 56px; height: 56px; background: var(--blue); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; margin: 0 auto 20px; border: 4px solid #fff; box-shadow: 0 0 0 2px var(--blue); }
+    .step h3 { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+    .step p { font-size: 14px; color: var(--muted); line-height: 1.6; }
+
+    /* SOCIAL PROOF */
+    .testimonials { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 48px; }
+    .testimonial { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; }
+    .stars { color: #f59e0b; font-size: 15px; margin-bottom: 14px; }
+    .testimonial blockquote { font-size: 15px; line-height: 1.7; color: var(--text); margin: 0 0 20px; }
+    .testimonial-author { display: flex; align-items: center; gap: 12px; }
+    .t-avatar { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+    .t-name { font-size: 14px; font-weight: 700; }
+    .t-role { font-size: 13px; color: var(--muted); }
+
+    /* PRICING */
+    .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 48px; }
+    .pricing-card { border: 1px solid var(--border); border-radius: 18px; padding: 32px; position: relative; transition: transform 0.2s, box-shadow 0.2s; }
+    .pricing-card:hover { transform: translateY(-4px); box-shadow: 0 16px 48px rgba(0,0,0,0.1); }
+    .pricing-card.featured { border: 2px solid var(--blue); box-shadow: 0 8px 32px rgba(37,99,235,0.15); }
+    .featured-badge { position: absolute; top: -14px; left: 50%; transform: translateX(-50%); background: var(--blue); color: #fff; font-size: 12px; font-weight: 700; padding: 4px 16px; border-radius: 20px; white-space: nowrap; }
+    .pricing-name { font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); margin-bottom: 8px; }
+    .pricing-price { font-size: 44px; font-weight: 800; letter-spacing: -1px; color: var(--text); line-height: 1; }
+    .pricing-price span { font-size: 16px; font-weight: 400; color: var(--muted); }
+    .pricing-desc { font-size: 14px; color: var(--muted); margin: 8px 0 24px; }
+    .pricing-features { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
+    .pricing-features li { font-size: 14px; display: flex; gap: 10px; align-items: flex-start; }
+    .pricing-features li::before { content: "✓"; color: #22c55e; font-weight: 700; flex-shrink: 0; }
+    .pricing-note { font-size: 12px; color: var(--muted); text-align: center; margin-top: 12px; }
+
+    /* FAQ */
+    .faq-list { display: flex; flex-direction: column; gap: 0; max-width: 720px; }
+    .faq-item { border-bottom: 1px solid var(--border); }
+    .faq-q { padding: 20px 0; font-size: 16px; font-weight: 600; cursor: pointer; display: flex; justify-content: space-between; align-items: center; list-style: none; }
+    .faq-q::after { content: "+"; font-size: 20px; color: var(--muted); font-weight: 300; transition: transform 0.2s; }
+    .faq-item.open .faq-q::after { transform: rotate(45deg); }
+    .faq-a { font-size: 15px; color: var(--muted); line-height: 1.7; max-height: 0; overflow: hidden; transition: max-height 0.3s ease, padding 0.3s; }
+    .faq-item.open .faq-a { max-height: 200px; padding-bottom: 20px; }
+
+    /* CTA BANNER */
+    .cta-banner {
+      background: linear-gradient(135deg, #1e3a8a 0%, var(--blue) 100%);
+      color: #fff; text-align: center; padding: 96px 24px;
+    }
+    .cta-banner h2 { color: #fff; margin-bottom: 16px; }
+    .cta-banner p { color: rgba(255,255,255,0.8); font-size: 18px; max-width: 500px; margin: 0 auto 36px; }
+    .btn-white { background: #fff; color: var(--blue); }
+    .btn-white:hover { background: #f0f7ff; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border); padding: 48px;
+      display: flex; justify-content: space-between; align-items: center;
+      color: var(--muted); font-size: 13px;
+    }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+    .footer-links { display: flex; gap: 24px; }
+
+    @media (max-width: 768px) {
+      nav { padding: 0 20px; }
+      .nav-links { display: none; }
+      .features-grid, .steps, .testimonials, .pricing-grid { grid-template-columns: 1fr; }
+      .steps::before { display: none; }
+      footer { flex-direction: column; gap: 16px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">⚡ SupportBot</div>
+  <div class="nav-links">
+    <a href="#features">Features</a>
+    <a href="#how-it-works">How it works</a>
+    <a href="#pricing">Pricing</a>
+    <a href="#faq">FAQ</a>
+  </div>
+  <div class="nav-cta">
+    <a href="/dashboard" class="btn btn-ghost">Sign in</a>
+    <a href="/dashboard" class="btn btn-primary">Start free trial</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge"><span></span> Powered by Claude AI</div>
+  <h1>Customer support that<br/><em>never sleeps</em></h1>
+  <p class="hero-sub">Deploy a fully trained AI assistant on your website in minutes. It learns from your docs and handles questions 24/7 — no hiring, no training, no burnout.</p>
+  <div class="hero-ctas">
+    <a href="/dashboard" class="btn btn-primary btn-lg">Start 14-day free trial →</a>
+    <a href="#how-it-works" class="btn btn-ghost btn-lg">See how it works</a>
+  </div>
+  <p class="hero-trust">No credit card required · <strong>14 days free</strong> · Cancel anytime</p>
+
+  <div class="preview-wrap">
+    <div class="preview-browser">
+      <div class="preview-bar">
+        <div class="dot dot-r"></div>
+        <div class="dot dot-y"></div>
+        <div class="dot dot-g"></div>
+        <div class="preview-url">yourstore.com</div>
+      </div>
+      <div class="preview-content">
+        <div class="preview-site">
+          <h3>🛍️ Your Online Store</h3>
+          <p>Your products, your brand</p>
+        </div>
+        <div class="fake-widget">
+          <div class="fw-header">
+            <div class="fw-header-row">
+              <div class="fw-avatar">💬</div>
+              <div><h4>Support</h4><p>Typically replies instantly</p></div>
+            </div>
+          </div>
+          <div class="fw-msgs">
+            <div class="fw-msg bot">Hi there! 👋 How can I help you today?</div>
+            <div class="fw-msg user">What's your return policy?</div>
+            <div class="fw-msg bot">
+              <div class="fw-typing"><span></span><span></span><span></span></div>
+            </div>
+          </div>
+          <div class="fw-input">
+            <span>Type a message...</span>
+            <div class="fw-send">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="white"><path d="M2 21l21-9L2 3v7l15 2-15 2z"/></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="section-inner">
+    <div class="section-label">Features</div>
+    <h2>Everything you need.<br/>Nothing you don't.</h2>
+    <p class="section-sub">Built specifically for small and mid-size businesses who need support coverage without the headcount.</p>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🧠</div>
+        <h3>Learns from your docs</h3>
+        <p>Upload PDFs or paste a URL. The AI reads your content and only answers from it — no hallucinations, no off-brand responses.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">⚡</div>
+        <h3>One line to install</h3>
+        <p>Paste a single script tag on your website. The chat widget appears instantly — no developer required, works on any platform.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🌍</div>
+        <h3>Always on, always fast</h3>
+        <p>Your AI answers in seconds, around the clock. Weekends, holidays, 3am — it never goes offline or calls in sick.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <h3>Conversation analytics</h3>
+        <p>See what customers are asking, spot knowledge gaps in your docs, and track volume over time from your dashboard.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔒</div>
+        <h3>Stays in your lane</h3>
+        <p>The bot only answers using your content. If it doesn't know, it directs the user to contact you — no guessing, no embarrassing replies.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🎨</div>
+        <h3>Matches your brand</h3>
+        <p>Customise the bot's name, colour, and position. It feels like a natural part of your website, not a third-party plugin.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how-it-works" class="hiw-bg">
+  <div class="section-inner">
+    <div class="section-label">How it works</div>
+    <h2>Up and running in under 10 minutes</h2>
+    <p class="section-sub">No technical knowledge needed. If you can copy and paste, you can deploy SupportBot.</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h3>Create account</h3>
+        <p>Sign up free. No credit card needed for your 14-day trial.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h3>Upload your docs</h3>
+        <p>Add your FAQ, product guides, or policies as PDF or URL.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h3>Copy the snippet</h3>
+        <p>Grab your unique one-line embed code from your dashboard.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <h3>Go live</h3>
+        <p>Paste it on your site. Your AI bot is live and answering instantly.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section>
+  <div class="section-inner">
+    <div class="section-label">Social proof</div>
+    <h2>Businesses that never sleep anymore</h2>
+    <div class="testimonials">
+      <div class="testimonial">
+        <div class="stars">★★★★★</div>
+        <blockquote>"We used to spend 2 hours every morning answering the same questions. Now SupportBot handles them and I wake up to zero support emails."</blockquote>
+        <div class="testimonial-author">
+          <div class="t-avatar" style="background:#fef3c7">🛍️</div>
+          <div><div class="t-name">Marta V.</div><div class="t-role">Founder, online clothing boutique</div></div>
+        </div>
+      </div>
+      <div class="testimonial">
+        <div class="stars">★★★★★</div>
+        <blockquote>"Setup took 8 minutes. I uploaded our help docs, pasted the code, and it was running. Our customers love getting answers instantly at midnight."</blockquote>
+        <div class="testimonial-author">
+          <div class="t-avatar" style="background:#dcfce7">🏋️</div>
+          <div><div class="t-name">Tom K.</div><div class="t-role">CEO, fitness app startup</div></div>
+        </div>
+      </div>
+      <div class="testimonial">
+        <div class="stars">★★★★★</div>
+        <blockquote>"The ROI is obvious. We were paying €1,800/mo for a part-time support person. Now we pay €299 and get better, faster, 24/7 coverage."</blockquote>
+        <div class="testimonial-author">
+          <div class="t-avatar" style="background:#ede9fe">🏠</div>
+          <div><div class="t-name">Lena B.</div><div class="t-role">Director, property management agency</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing" class="hiw-bg">
+  <div class="section-inner">
+    <div class="section-label">Pricing</div>
+    <h2>Simple, predictable pricing</h2>
+    <p class="section-sub">All plans include a 14-day free trial. No credit card required to start.</p>
+    <div class="pricing-grid">
+      <div class="pricing-card">
+        <div class="pricing-name">Starter</div>
+        <div class="pricing-price">€99<span>/month</span></div>
+        <div class="pricing-desc">For small businesses just getting started.</div>
+        <ul class="pricing-features">
+          <li>1 AI support bot</li>
+          <li>500 chats per month</li>
+          <li>PDF + URL doc ingestion</li>
+          <li>Analytics dashboard</li>
+          <li>Email support</li>
+          <li>14-day free trial</li>
+        </ul>
+        <a href="/dashboard" class="btn btn-ghost" style="width:100%;justify-content:center">Start free trial</a>
+      </div>
+      <div class="pricing-card featured">
+        <div class="featured-badge">Most Popular</div>
+        <div class="pricing-name">Pro</div>
+        <div class="pricing-price">€299<span>/month</span></div>
+        <div class="pricing-desc">For growing businesses with higher volume.</div>
+        <ul class="pricing-features">
+          <li>Up to 5 AI bots</li>
+          <li>2,000 chats per month</li>
+          <li>Priority doc processing</li>
+          <li>Advanced analytics</li>
+          <li>Priority support</li>
+          <li>Custom bot name & colour</li>
+        </ul>
+        <a href="/dashboard" class="btn btn-primary" style="width:100%;justify-content:center">Start free trial</a>
+        <div class="pricing-note">Most popular for e-commerce & SaaS</div>
+      </div>
+      <div class="pricing-card">
+        <div class="pricing-name">Enterprise</div>
+        <div class="pricing-price">€599<span>/month</span></div>
+        <div class="pricing-desc">For agencies and high-traffic businesses.</div>
+        <ul class="pricing-features">
+          <li>Unlimited bots</li>
+          <li>Unlimited chats</li>
+          <li>Remove SupportBot branding</li>
+          <li>SLA uptime guarantee</li>
+          <li>Dedicated account manager</li>
+          <li>Custom onboarding</li>
+        </ul>
+        <a href="/dashboard" class="btn btn-ghost" style="width:100%;justify-content:center">Start free trial</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq">
+  <div class="section-inner">
+    <div class="section-label">FAQ</div>
+    <h2>Common questions</h2>
+    <div class="faq-list">
+      <div class="faq-item">
+        <div class="faq-q">Does the bot only answer from my documents?</div>
+        <div class="faq-a">Yes. The AI is strictly constrained to the content you upload. It will never make up answers or go off-topic. If a question isn't covered by your docs, it politely tells the user to contact you directly.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">What file types can I upload?</div>
+        <div class="faq-a">You can upload PDF files or paste any public URL (your FAQ page, help centre, product pages, etc.). We extract the text, chunk it, and make it searchable for the AI.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Will it work on my website platform?</div>
+        <div class="faq-a">Yes. The embed code is a single JavaScript tag that works on any platform — Shopify, Webflow, WordPress, Wix, custom HTML, or anything else. If your site can run JavaScript, it works.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">What happens when I hit my chat limit?</div>
+        <div class="faq-a">The bot displays a message directing users to contact you directly. You'll receive an email warning at 80% usage so you can upgrade before hitting the limit.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Can I cancel anytime?</div>
+        <div class="faq-a">Absolutely. Cancel from your dashboard at any time with no cancellation fees. Your bot will remain active until the end of the billing period.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA BANNER -->
+<section class="cta-banner">
+  <div class="section-inner">
+    <h2>Ready to stop answering the same questions?</h2>
+    <p>Join hundreds of businesses running support on autopilot. Start free — no credit card needed.</p>
+    <a href="/dashboard" class="btn btn-white btn-lg">Start your 14-day free trial →</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="nav-logo">⚡ SupportBot</div>
+  <div class="footer-links">
+    <a href="#">Privacy</a>
+    <a href="#">Terms</a>
+    <a href="#">Status</a>
+    <a href="mailto:hello@supportbot.ai">Contact</a>
+  </div>
+  <div>© 2025 SupportBot. All rights reserved.</div>
+</footer>
+
+<script>
+  // FAQ accordion
+  document.querySelectorAll(".faq-q").forEach(q => {
+    q.addEventListener("click", () => {
+      const item = q.parentElement;
+      const isOpen = item.classList.contains("open");
+      document.querySelectorAll(".faq-item").forEach(i => i.classList.remove("open"));
+      if (!isOpen) item.classList.add("open");
+    });
+  });
+
+  // Animate typing indicator in hero preview
+  setTimeout(() => {
+    const typing = document.querySelector(".fw-typing").parentElement;
+    typing.innerHTML = "Returns are free within 30 days. Just email us and we'll send a prepaid label. 📦";
+    typing.style.borderRadius = "10px 10px 10px 2px";
+  }, 2500);
+</script>
+</body>
+</html>

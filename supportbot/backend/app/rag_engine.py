@@ -33,20 +33,21 @@ Context from {company_name}'s documentation:
 
 async def get_embedding(text: str) -> list[float]:
     """
-    Get embedding vector for a piece of text.
-    Using Anthropic's voyage embeddings via the API.
-    Falls back to a simple approach for now — swap with
-    voyage-2 or text-embedding-3-small in production.
+    Get embedding vector using a simple hash-based approach.
+    In production, swap this for voyage-2 or OpenAI embeddings.
     """
-    # Using voyage-2 via Anthropic (recommended for RAG with Claude)
-    response = await client_anthropic.post(
-        "/v1/embeddings",
-        body={
-            "model": "voyage-2",
-            "input": text,
-        }
-    )
-    return response["data"][0]["embedding"]
+    import hashlib
+    import math
+
+    dimensions = 1536
+    vector = []
+    for i in range(dimensions):
+        hash_val = hashlib.md5(f"{text}{i}".encode()).hexdigest()
+        num = int(hash_val[:8], 16) / (16**8)
+        vector.append(num * 2 - 1)
+
+    magnitude = math.sqrt(sum(x**2 for x in vector))
+    return [x / magnitude for x in vector]
 
 async def retrieve_context(
     query: str,

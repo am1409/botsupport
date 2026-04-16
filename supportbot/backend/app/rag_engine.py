@@ -73,7 +73,7 @@ async def retrieve_context(
         }
     )
     rows = result.fetchall()
-    return [row.content for row in rows if row.similarity > 0.6]
+    return [row.content for row in rows]
 
 async def stream_answer(
     question: str,

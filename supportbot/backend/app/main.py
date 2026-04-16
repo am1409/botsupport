@@ -36,8 +36,18 @@ async def health():
 
 @app.get("/widget.js")
 async def widget():
-    widget_path = os.path.join(os.path.dirname(__file__), "..", "..", "widget", "widget.js")
-    return FileResponse(widget_path, media_type="application/javascript")
+    # Try multiple possible paths
+    possible_paths = [
+        "/app/widget/widget.js",
+        os.path.join(os.path.dirname(__file__), "..", "..", "widget", "widget.js"),
+        os.path.join(os.path.dirname(__file__), "..", "widget", "widget.js"),
+        os.path.join(os.path.dirname(__file__), "widget", "widget.js"),
+    ]
+    for path in possible_paths:
+        resolved = os.path.realpath(path)
+        if os.path.exists(resolved):
+            return FileResponse(resolved, media_type="application/javascript")
+    return {"error": "widget not found", "tried": possible_paths}
 @app.get("/health")
 async def health():
     return {"status": "ok"}

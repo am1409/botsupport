@@ -1,7 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from app.routers import chat, clients, ingest, auth, billing
 from app.database import init_db
+import os
 
 app = FastAPI(
     title="SupportBot API",
@@ -27,6 +30,14 @@ app.include_router(ingest.router,  prefix="/ingest",  tags=["Ingestion"])
 app.include_router(chat.router,    prefix="/chat",    tags=["Chat"])
 app.include_router(billing.router, prefix="/billing", tags=["Billing"])
 
+@app.get("/health")
+async def health():
+    return {"status": "ok"}
+
+@app.get("/widget.js")
+async def widget():
+    widget_path = os.path.join(os.path.dirname(__file__), "..", "..", "widget", "widget.js")
+    return FileResponse(widget_path, media_type="application/javascript")
 @app.get("/health")
 async def health():
     return {"status": "ok"}

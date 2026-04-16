@@ -55,19 +55,15 @@ async def retrieve_context(
     db: AsyncSession,
     top_k: int = 5
 ) -> list[str]:
-    """
-    Embed the query, find the top_k most similar chunks
-    from this client's document store using pgvector cosine similarity.
-    """
     query_embedding = await get_embedding(query)
     embedding_str = "[" + ",".join(str(x) for x in query_embedding) + "]"
 
     result = await db.execute(
         text("""
-            SELECT content, 1 - (embedding <=> :embedding::vector) AS similarity
+            SELECT content, 1 - (embedding <=> CAST(:embedding AS vector)) AS similarity
             FROM document_chunks
-            WHERE client_id = :client_id
-            ORDER BY embedding <=> :embedding::vector
+            WHERE client_id = CAST(:client_id AS uuid)
+            ORDER BY embedding <=> CAST(:embedding AS vector)
             LIMIT :top_k
         """),
         {

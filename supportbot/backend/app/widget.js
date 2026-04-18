@@ -1,5 +1,5 @@
 /**
- * SupportBot Widget — v1.0.0
+ * Nomi Widget — v1.0.0
  * Paste this on any website:
  * <script src="https://api.yourdomain.com/widget.js" data-client-id="CLIENT_ID"></script>
  */
@@ -11,7 +11,7 @@
   const PRIMARY_COLOR = script.getAttribute("data-color") || "#2563EB";
   const BOT_NAME = script.getAttribute("data-name") || "Support";
 
-  if (!CLIENT_ID) return console.error("SupportBot: missing data-client-id");
+  if (!CLIENT_ID) return console.error("Nomi: missing data-client-id");
 
   // --- Session ID (persists in sessionStorage per tab) ---
   let sessionId = sessionStorage.getItem("sb_session_" + CLIENT_ID);
@@ -154,7 +154,7 @@
         <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
       </button>
     </div>
-    <div id="sb-branding">Powered by <a href="#" target="_blank">SupportBot AI</a></div>
+    <div id="sb-branding">Powered by <a href="#" target="_blank">Nomi AI</a></div>
   `;
 
   document.body.appendChild(launcher);

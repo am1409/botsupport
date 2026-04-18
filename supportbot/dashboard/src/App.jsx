@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 
-const API = "http://localhost:8000"; // Change to your deployed API URL
+const API = "https://botsupport-production.up.railway.app";
 
 // ─── API helpers ───────────────────────────────────────────────
 const apiFetch = async (path, opts = {}, token = null) => {

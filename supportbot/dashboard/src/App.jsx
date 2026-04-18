@@ -45,7 +45,7 @@ function AuthScreen({ onLogin }) {
   return (
     <div style={styles.authWrap}>
       <div style={styles.authCard}>
-        <div style={styles.logo}>⚡ SupportBot</div>
+        <div style={styles.logo}>✦ Nomi</div>
         <h2 style={styles.authTitle}>{mode === "login" ? "Welcome back" : "Start free trial"}</h2>
         {mode === "register" && (
           <input style={styles.input} placeholder="Company name"
@@ -153,7 +153,7 @@ function Dashboard({ token, onLogout }) {
     <div style={styles.dashWrap}>
       {/* Sidebar */}
       <aside style={styles.sidebar}>
-        <div style={styles.sidebarLogo}>⚡ SupportBot</div>
+        <div style={styles.sidebarLogo}>✦ Nomi</div>
         <nav style={styles.nav}>
           {[
             ["overview", "📊", "Overview"],

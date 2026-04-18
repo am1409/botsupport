@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 
-const API = "https://botsupport-production.up.railway.app";
+const API = "http://localhost:8000"; // Change to your deployed API URL
 
 // ─── API helpers ───────────────────────────────────────────────
 const apiFetch = async (path, opts = {}, token = null) => {
@@ -159,6 +159,7 @@ function Dashboard({ token, onLogout }) {
             ["overview", "📊", "Overview"],
             ["documents", "📄", "Documents"],
             ["embed", "🔌", "Embed Code"],
+            ["guide", "📖", "Setup Guide"],
             ["billing", "💳", "Billing"],
           ].map(([id, icon, label]) => (
             <button key={id} style={{ ...styles.navBtn, ...(tab === id ? styles.navBtnActive : {}) }}
@@ -178,6 +179,7 @@ function Dashboard({ token, onLogout }) {
               {tab === "overview" && "Overview"}
               {tab === "documents" && "Knowledge Base"}
               {tab === "embed" && "Embed Your Bot"}
+              {tab === "guide" && "Setup Guide"}
               {tab === "billing" && "Billing & Plan"}
             </h1>
             <p style={styles.pageSubtitle}>{profile?.company_name}</p>
@@ -290,6 +292,139 @@ function Dashboard({ token, onLogout }) {
   data-position="right"
 ></script>`}</div>
             </div>
+          </div>
+        )}
+
+        {/* Guide Tab */}
+        {tab === "guide" && (
+          <div style={styles.tabContent}>
+
+            <div style={styles.card}>
+              <p style={{ fontSize: 15, color: "#64748b", lineHeight: 1.7, margin: 0 }}>
+                Follow these four steps to get your Nomi bot live on your website. The whole process takes about 10 minutes. You do not need any technical knowledge — if you can copy and paste, you can do this.
+              </p>
+            </div>
+
+            {/* Step 1 */}
+            <div style={styles.guideStep}>
+              <div style={styles.guideStepHeader}>
+                <div style={styles.guideStepNum}>1</div>
+                <div>
+                  <div style={styles.guideStepTitle}>Add your content</div>
+                  <div style={styles.guideStepSub}>Teach the bot about your business</div>
+                </div>
+              </div>
+              <div style={styles.guideStepBody}>
+                <p style={styles.guideText}>The bot can only answer questions based on content you provide. Think of it like giving the bot a manual to read. You can add content in two ways:</p>
+                <div style={styles.guideOption}>
+                  <div style={styles.guideOptionTitle}>📎 Upload a PDF</div>
+                  <p style={styles.guideText}>Go to the <strong>Documents</strong> tab and click "Choose PDF". Upload any document that describes your business — your FAQ, product information, pricing, return policy, opening hours, or anything customers typically ask about.</p>
+                </div>
+                <div style={styles.guideOption}>
+                  <div style={styles.guideOptionTitle}>🔗 Add a URL</div>
+                  <p style={styles.guideText}>Go to the <strong>Documents</strong> tab and paste a link to any page on your website — your FAQ page, about page, or product pages. The bot will read and learn from that page automatically.</p>
+                </div>
+                <div style={styles.guideTip}>
+                  💡 <strong>Tip:</strong> The more information you add, the better your bot will answer. Start with your most frequently asked questions.
+                </div>
+              </div>
+            </div>
+
+            {/* Step 2 */}
+            <div style={styles.guideStep}>
+              <div style={styles.guideStepHeader}>
+                <div style={styles.guideStepNum}>2</div>
+                <div>
+                  <div style={styles.guideStepTitle}>Wait for processing</div>
+                  <div style={styles.guideStepSub}>Usually takes less than a minute</div>
+                </div>
+              </div>
+              <div style={styles.guideStepBody}>
+                <p style={styles.guideText}>After uploading a document or URL, go back to the <strong>Documents</strong> tab and check the status next to your document. It will say one of the following:</p>
+                <div style={styles.guideStatusList}>
+                  <div style={styles.guideStatus}><span style={{ ...styles.guideStatusBadge, background: "#fef9c3", color: "#ca8a04" }}>processing</span> — the bot is reading your content, wait a moment and refresh</div>
+                  <div style={styles.guideStatus}><span style={{ ...styles.guideStatusBadge, background: "#dcfce7", color: "#16a34a" }}>ready</span> — your content has been added, the bot can now answer from it</div>
+                  <div style={styles.guideStatus}><span style={{ ...styles.guideStatusBadge, background: "#fee2e2", color: "#dc2626" }}>failed</span> — something went wrong, try deleting and uploading again</div>
+                </div>
+                <p style={styles.guideText}>Only continue to the next step once your document shows <strong>ready</strong>.</p>
+              </div>
+            </div>
+
+            {/* Step 3 */}
+            <div style={styles.guideStep}>
+              <div style={styles.guideStepHeader}>
+                <div style={styles.guideStepNum}>3</div>
+                <div>
+                  <div style={styles.guideStepTitle}>Copy your embed code</div>
+                  <div style={styles.guideStepSub}>One line of code unique to your account</div>
+                </div>
+              </div>
+              <div style={styles.guideStepBody}>
+                <p style={styles.guideText}>Go to the <strong>Embed Code</strong> tab in the left menu. You will see a line of code that starts with <code style={styles.inlineCode}>&lt;script</code>. This is your personal embed code — it is unique to your account.</p>
+                <p style={styles.guideText}>Click the <strong>"Copy to Clipboard"</strong> button to copy it. Keep it somewhere handy as you will need it in the next step.</p>
+                <div style={styles.guideTip}>
+                  💡 <strong>Tip:</strong> You can customise the colour and name of the chat bubble by changing the <code style={styles.inlineCode}>data-color</code> and <code style={styles.inlineCode}>data-name</code> values in the code. The Embed Code tab shows you exactly how to do this.
+                </div>
+              </div>
+            </div>
+
+            {/* Step 4 */}
+            <div style={styles.guideStep}>
+              <div style={styles.guideStepHeader}>
+                <div style={styles.guideStepNum}>4</div>
+                <div>
+                  <div style={styles.guideStepTitle}>Add the code to your website</div>
+                  <div style={styles.guideStepSub}>Works on any website platform</div>
+                </div>
+              </div>
+              <div style={styles.guideStepBody}>
+                <p style={styles.guideText}>Paste your embed code into your website just before the closing <code style={styles.inlineCode}>&lt;/body&gt;</code> tag. Here is how to do it on the most common platforms:</p>
+
+                <div style={styles.guideOption}>
+                  <div style={styles.guideOptionTitle}>🛍️ Shopify</div>
+                  <p style={styles.guideText}>Go to your Shopify admin → Online Store → Themes → click the three dots next to your theme → Edit code → find the file called <strong>theme.liquid</strong> → scroll to the very bottom → paste your code just before <code style={styles.inlineCode}>&lt;/body&gt;</code> → click Save.</p>
+                </div>
+
+                <div style={styles.guideOption}>
+                  <div style={styles.guideOptionTitle}>🌐 WordPress</div>
+                  <p style={styles.guideText}>Go to your WordPress dashboard → Appearance → Theme Editor → find the file called <strong>footer.php</strong> → paste your code just before <code style={styles.inlineCode}>&lt;/body&gt;</code> → click Update File. Alternatively install the free plugin "Insert Headers and Footers" and paste the code there.</p>
+                </div>
+
+                <div style={styles.guideOption}>
+                  <div style={styles.guideOptionTitle}>🎨 Webflow</div>
+                  <p style={styles.guideText}>Go to your Webflow project → Project Settings → Custom Code → scroll to the <strong>Footer Code</strong> section → paste your code there → click Save → publish your site.</p>
+                </div>
+
+                <div style={styles.guideOption}>
+                  <div style={styles.guideOptionTitle}>🟦 Wix</div>
+                  <p style={styles.guideText}>Go to your Wix dashboard → Settings → Custom Code → click <strong>+ Add Custom Code</strong> → paste your code → set it to load in the Body - end → click Apply.</p>
+                </div>
+
+                <div style={styles.guideOption}>
+                  <div style={styles.guideOptionTitle}>📄 Any other website</div>
+                  <p style={styles.guideText}>Open your website's main HTML file → find the line that says <code style={styles.inlineCode}>&lt;/body&gt;</code> near the very end → paste your embed code on the line just above it → save the file.</p>
+                </div>
+
+                <div style={styles.guideTip}>
+                  💡 <strong>Not sure how to do this?</strong> Simply send your embed code and these instructions to whoever built your website — it takes them less than 2 minutes to add.
+                </div>
+              </div>
+            </div>
+
+            {/* Done */}
+            <div style={{ ...styles.card, background: "#f0fdf4", border: "1px solid #bbf7d0", textAlign: "center", padding: "32px" }}>
+              <div style={{ fontSize: 36, marginBottom: 12 }}>🎉</div>
+              <div style={{ fontSize: 18, fontWeight: 700, color: "#15803d", marginBottom: 8 }}>You are all set!</div>
+              <p style={{ color: "#16a34a", margin: 0, fontSize: 14 }}>Once the code is on your site, a chat bubble will appear automatically. Your customers can start getting answers instantly — 24 hours a day, 7 days a week.</p>
+            </div>
+
+            {/* Help */}
+            <div style={{ ...styles.card, textAlign: "center" }}>
+              <p style={{ color: "#64748b", fontSize: 14, margin: 0 }}>
+                Need help? Contact us at <a href="mailto:a.moradi1409@gmail.com" style={{ color: "#2563EB", fontWeight: 600 }}>a.moradi1409@gmail.com</a> and we will get you set up.
+              </p>
+            </div>
+
           </div>
         )}
 
@@ -428,4 +563,19 @@ const styles = {
 
   loadingWrap: { display: "flex", alignItems: "center", justifyContent: "center", height: "100vh", gap: 12, color: C.muted, fontSize: 16 },
   spinner: { width: 20, height: 20, border: `2px solid ${C.border}`, borderTopColor: C.blue, borderRadius: "50%", animation: "spin 0.8s linear infinite" },
+
+  guideStep: { background: C.card, borderRadius: 14, border: `1px solid ${C.border}`, overflow: "hidden" },
+  guideStepHeader: { display: "flex", alignItems: "center", gap: 16, padding: "20px 24px", borderBottom: `1px solid ${C.border}`, background: "#f8fafc" },
+  guideStepNum: { width: 36, height: 36, background: C.blue, color: "#fff", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 16, flexShrink: 0 },
+  guideStepTitle: { fontSize: 16, fontWeight: 700, color: C.text },
+  guideStepSub: { fontSize: 13, color: C.muted, marginTop: 2 },
+  guideStepBody: { padding: "20px 24px", display: "flex", flexDirection: "column", gap: 14 },
+  guideText: { fontSize: 14, color: "#334155", lineHeight: 1.7, margin: 0 },
+  guideOption: { background: "#f8fafc", borderRadius: 10, padding: "16px 18px", border: `1px solid ${C.border}` },
+  guideOptionTitle: { fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 8 },
+  guideTip: { background: "#fffbeb", border: "1px solid #fde68a", borderRadius: 10, padding: "12px 16px", fontSize: 13, color: "#92400e", lineHeight: 1.6 },
+  guideStatusList: { display: "flex", flexDirection: "column", gap: 10 },
+  guideStatus: { display: "flex", alignItems: "center", gap: 10, fontSize: 14, color: "#334155" },
+  guideStatusBadge: { fontSize: 12, fontWeight: 700, padding: "3px 10px", borderRadius: 20, flexShrink: 0 },
+  inlineCode: { background: "#f1f5f9", border: `1px solid ${C.border}`, borderRadius: 4, padding: "1px 6px", fontSize: 12, fontFamily: "monospace", color: "#0f172a" },
 };

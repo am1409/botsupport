@@ -166,6 +166,10 @@ function Dashboard({ token, onLogout }) {
   data-color="${cfg.color}"
   data-name="${cfg.name}"
   data-position="${cfg.position}"
+  data-greeting="${cfg.greeting}"
+  data-placeholder="${cfg.placeholder}"
+  data-language="${cfg.language}"
+  data-offline="${cfg.offlineMessage}"
 ></script>`;
   };
 

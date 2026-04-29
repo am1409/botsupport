@@ -8,7 +8,8 @@
   const GREETING    = script.getAttribute("data-greeting") || "Hi there! How can I help you today? 👋";
   const PLACEHOLDER = script.getAttribute("data-placeholder") || "Type a message...";
   const LANGUAGE    = script.getAttribute("data-language") || "en";
-  const OFFLINE_MSG = script.getAttribute("data-offline") || "I don't have enough information to answer that. Please contact our support team directly.";
+  const OFFLINE_MSG    = script.getAttribute("data-offline") || "I don't have enough information to answer that. Please contact our support team directly.";
+  const RESPONSE_STYLE = script.getAttribute("data-style") || "balanced";
 
   if (!CLIENT_ID) return console.error("Nomi: missing data-client-id");
 
@@ -226,7 +227,7 @@
       const response = await fetch(`${API_URL}/chat/${CLIENT_ID}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ session_id: sessionId, message: text, history }),
+        body: JSON.stringify({ session_id: sessionId, message: text, history, language: LANGUAGE, response_style: RESPONSE_STYLE }),
       });
 
       if (!response.ok) {

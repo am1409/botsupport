@@ -1,17 +1,10 @@
-"""
-RAG Engine — Retrieval Augmented Generation
-The core AI brain. Given a user question + client_id:
-1. Embed the question
-2. Find the most relevant doc chunks (vector similarity)
-3. Build a prompt with those chunks as context
-4. Stream Claude's answer back
-"""
 import anthropic
-import numpy as np
-from sqlalchemy import select, text
+import math
+import hashlib
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.config import settings
-from app.models import DocumentChunk, Client
+from app.models import Client
 
 client_anthropic = anthropic.AsyncAnthropic(api_key=settings.anthropic_api_key)
 
@@ -21,9 +14,9 @@ You answer questions based ONLY on the provided context from the company's docum
 Rules:
 - Only answer using the provided context. Do not make things up.
 - If the answer is not in the context, say: "I don't have information on that. Please contact our support team directly."
-- Be friendly, concise, and professional.
 - Never reveal that you are an AI built on Claude or any underlying technology.
 - Never mention "context", "documents", or "chunks" — respond naturally as a support agent.
+- Response style: {style_instruction}
 
 Context from {company_name}'s documentation:
 ---
@@ -31,21 +24,19 @@ Context from {company_name}'s documentation:
 ---
 """
 
-async def get_embedding(text: str) -> list[float]:
-    """
-    Get embedding vector using a simple hash-based approach.
-    In production, swap this for voyage-2 or OpenAI embeddings.
-    """
-    import hashlib
-    import math
+STYLE_INSTRUCTIONS = {
+    "concise": "Keep responses very short — maximum 2 sentences. Get straight to the point. No extra explanation.",
+    "balanced": "Keep responses clear and friendly but brief — 2 to 4 sentences maximum. Include only what is necessary.",
+    "detailed": "Give thorough, complete answers. Include helpful context and explain things fully so the customer has everything they need.",
+}
 
+async def get_embedding(text_input: str) -> list[float]:
     dimensions = 1536
     vector = []
     for i in range(dimensions):
-        hash_val = hashlib.md5(f"{text}{i}".encode()).hexdigest()
+        hash_val = hashlib.md5(f"{text_input}{i}".encode()).hexdigest()
         num = int(hash_val[:8], 16) / (16**8)
         vector.append(num * 2 - 1)
-
     magnitude = math.sqrt(sum(x**2 for x in vector))
     return [x / magnitude for x in vector]
 
@@ -57,7 +48,6 @@ async def retrieve_context(
 ) -> list[str]:
     query_embedding = await get_embedding(query)
     embedding_str = "[" + ",".join(str(x) for x in query_embedding) + "]"
-
     result = await db.execute(
         text("""
             SELECT content, 1 - (embedding <=> CAST(:embedding AS vector)) AS similarity
@@ -80,16 +70,12 @@ async def stream_answer(
     client_id: str,
     conversation_history: list[dict],
     db: AsyncSession,
+    language: str = "en",
+    response_style: str = "balanced",
 ):
-    """
-    Full RAG pipeline — retrieve context, build prompt, stream Claude's answer.
-    Yields text chunks as they arrive for real-time streaming to the widget.
-    """
-    # Get client info for personalised system prompt
     client = await db.get(Client, client_id)
     company_name = client.company_name if client else "the company"
 
-    # Retrieve relevant context chunks
     context_chunks = await retrieve_context(question, client_id, db)
 
     if not context_chunks:
@@ -97,15 +83,19 @@ async def stream_answer(
         return
 
     context = "\n\n".join(context_chunks)
-    system = SYSTEM_PROMPT.format(company_name=company_name, context=context)
+    style_instruction = STYLE_INSTRUCTIONS.get(response_style, STYLE_INSTRUCTIONS["balanced"])
 
-    # Build messages — include last 6 turns for conversation memory
+    system = SYSTEM_PROMPT.format(
+        company_name=company_name,
+        context=context,
+        style_instruction=style_instruction,
+    )
+
     messages = conversation_history[-6:] + [{"role": "user", "content": question}]
 
-    # Stream Claude's response
     async with client_anthropic.messages.stream(
         model="claude-sonnet-4-20250514",
-        max_tokens=1024,
+        max_tokens=600 if response_style == "concise" else 1024,
         system=system,
         messages=messages,
     ) as stream:

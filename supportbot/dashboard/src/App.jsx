@@ -129,6 +129,7 @@ function Dashboard({ token, onLogout }) {
       greeting: "Hi there! How can I help you today? 👋",
       position: "right",
       language: "en",
+      responseStyle: "balanced",
       showBranding: true,
       offlineMessage: "We are currently offline. Please email us and we will get back to you shortly.",
       placeholder: "Type a message...",
@@ -170,6 +171,7 @@ function Dashboard({ token, onLogout }) {
   data-placeholder="${cfg.placeholder}"
   data-language="${cfg.language}"
   data-offline="${cfg.offlineMessage}"
+  data-style="${cfg.responseStyle}"
 ></script>`;
   };
 
@@ -474,6 +476,29 @@ function Dashboard({ token, onLogout }) {
                     <option key={l.value} value={l.value}>{l.label}</option>
                   ))}
                 </select>
+              </div>
+            </div>
+
+            {/* Response Style */}
+            <div style={styles.card}>
+              <h3 style={styles.cardTitle}>Response Style</h3>
+              <p style={styles.helpText}>Control how long and detailed the bot's answers are.</p>
+              <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                {[
+                  { value: 'concise', label: '⚡ Concise', desc: 'Short and to the point. Max 2 sentences.' },
+                  { value: 'balanced', label: '✦ Balanced', desc: 'Clear and friendly. 2–4 sentences.' },
+                  { value: 'detailed', label: '📖 Detailed', desc: 'Full explanations with context.' },
+                ].map(s => (
+                  <div key={s.value} onClick={() => updateConfig('responseStyle', s.value)} style={{
+                    flex: 1, minWidth: 140, padding: '16px', borderRadius: 12, cursor: 'pointer',
+                    border: `2px solid ${widgetConfig.responseStyle === s.value ? C.blue : C.border}`,
+                    background: widgetConfig.responseStyle === s.value ? '#eff6ff' : '#fff',
+                    transition: 'all 0.15s',
+                  }}>
+                    <div style={{ fontSize: 15, fontWeight: 700, color: widgetConfig.responseStyle === s.value ? C.blue : C.text, marginBottom: 6 }}>{s.label}</div>
+                    <div style={{ fontSize: 12, color: C.muted, lineHeight: 1.5 }}>{s.desc}</div>
+                  </div>
+                ))}
               </div>
             </div>
 

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 
-const API = "https://botsupport-production.up.railway.app";
+const API = "https://api.nomisupport.com";
 
 // ─── API helpers ───────────────────────────────────────────────
 const apiFetch = async (path, opts = {}, token = null) => {

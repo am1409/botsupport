@@ -156,7 +156,7 @@
         <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
       </button>
     </div>
-    <div id="nomi-branding">Powered by <a href="https://landingpage-theta-tan-77.vercel.app" target="_blank">Nomi AI</a></div>
+    <div id="nomi-branding">Powered by <a href="https://nomisupport.com" target="_blank">Nomi AI</a></div>
   `;
 
   document.body.appendChild(launcher);

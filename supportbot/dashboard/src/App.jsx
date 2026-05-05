@@ -668,7 +668,7 @@ function Dashboard({ token, onLogout }) {
               <p style={{ color: "#16a34a", margin: 0, fontSize: 14 }}>Your bot is live and answering questions 24/7.</p>
             </div>
             <div style={{ ...styles.card, textAlign: "center" }}>
-              <p style={{ color: "#64748b", fontSize: 14, margin: 0 }}>Need help? <a href="mailto:a.moradi1409@gmail.com" style={{ color: "#2563EB", fontWeight: 600 }}>a.moradi1409@gmail.com</a></p>
+              <p style={{ color: "#64748b", fontSize: 14, margin: 0 }}>Need help? <a href="mailto:info@nomisupport.com" style={{ color: "#2563EB", fontWeight: 600 }}>info@nomisupport.com</a></p>
             </div>
           </div>
         )}

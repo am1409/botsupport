@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 
-const API = "https://api.nomisupport.com";
+const API = "https://botsupport-production.up.railway.app";
 
 // ─── API helpers ───────────────────────────────────────────────
 const apiFetch = async (path, opts = {}, token = null) => {
@@ -278,6 +278,45 @@ function Dashboard({ token, onLogout }) {
           </div>
           <div style={styles.planBadge}>{profile?.plan?.toUpperCase()}</div>
         </div>
+
+        {/* Trial Banner */}
+        {profile?.subscription_status === 'trialing' && profile?.trial_days_remaining !== null && (
+          <div style={{
+            background: profile.trial_days_remaining <= 3 ? '#fef2f2' : '#fffbeb',
+            border: `1px solid ${profile.trial_days_remaining <= 3 ? '#fecaca' : '#fde68a'}`,
+            borderRadius: 12, padding: '14px 20px', marginBottom: 20,
+            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+          }}>
+            <div style={{ fontSize: 14, color: profile.trial_days_remaining <= 3 ? '#991b1b' : '#92400e', fontWeight: 600 }}>
+              {profile.trial_days_remaining === 0
+                ? '⚠️ Your free trial ends today — upgrade now to keep your bot running'
+                : `⏳ ${profile.trial_days_remaining} day${profile.trial_days_remaining === 1 ? '' : 's'} left in your free trial`}
+            </div>
+            <button onClick={() => setTab('billing')} style={{
+              background: profile.trial_days_remaining <= 3 ? '#dc2626' : '#d97706',
+              color: '#fff', border: 'none', borderRadius: 8, padding: '8px 18px',
+              fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
+            }}>Upgrade now</button>
+          </div>
+        )}
+
+        {profile?.subscription_status === 'trial_expired' && (
+          <div style={{
+            background: '#fef2f2', border: '1px solid #fecaca',
+            borderRadius: 12, padding: '20px', marginBottom: 20, textAlign: 'center',
+          }}>
+            <div style={{ fontSize: 16, fontWeight: 700, color: '#991b1b', marginBottom: 8 }}>
+              ⚠️ Your free trial has ended
+            </div>
+            <div style={{ fontSize: 14, color: '#7f1d1d', marginBottom: 16 }}>
+              Your bot is currently paused. Choose a plan to reactivate it — takes less than a minute.
+            </div>
+            <button onClick={() => setTab('billing')} style={{
+              background: '#dc2626', color: '#fff', border: 'none', borderRadius: 8,
+              padding: '12px 28px', fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
+            }}>Choose a plan →</button>
+          </div>
+        )}
 
         {/* ── Overview ── */}
         {tab === "overview" && (

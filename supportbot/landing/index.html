@@ -23,7 +23,6 @@
     html { scroll-behavior: smooth; }
     body { font-family: 'DM Sans', sans-serif; color: var(--text); background: var(--bg); line-height: 1.6; }
 
-    /* NAV */
     nav {
       position: sticky; top: 0; z-index: 100;
       display: flex; align-items: center; justify-content: space-between;
@@ -43,7 +42,6 @@
     .btn-ghost:hover { background: #f8fafc; }
     .btn-lg { padding: 14px 32px; font-size: 15px; border-radius: 12px; }
 
-    /* HERO */
     .hero {
       text-align: center; padding: 96px 24px 80px;
       background: linear-gradient(180deg, #f0f7ff 0%, #fff 100%);
@@ -74,35 +72,16 @@
     .hero-trust { margin-top: 48px; color: var(--muted); font-size: 13px; }
     .hero-trust strong { color: var(--text); }
 
-    /* WIDGET PREVIEW */
-    .preview-wrap {
-      max-width: 900px; margin: 60px auto 0; padding: 0 24px;
-      position: relative;
-    }
-    .preview-browser {
-      background: #1e293b; border-radius: 16px; overflow: hidden;
-      box-shadow: 0 32px 80px rgba(0,0,0,0.2);
-    }
-    .preview-bar {
-      background: #334155; padding: 12px 16px; display: flex; gap: 6px; align-items: center;
-    }
+    .preview-wrap { max-width: 900px; margin: 60px auto 0; padding: 0 24px; position: relative; }
+    .preview-browser { background: #1e293b; border-radius: 16px; overflow: hidden; box-shadow: 0 32px 80px rgba(0,0,0,0.2); }
+    .preview-bar { background: #334155; padding: 12px 16px; display: flex; gap: 6px; align-items: center; }
     .dot { width: 10px; height: 10px; border-radius: 50%; }
     .dot-r { background: #ef4444; } .dot-y { background: #f59e0b; } .dot-g { background: #22c55e; }
     .preview-url { flex: 1; background: #1e293b; border-radius: 6px; padding: 4px 12px; font-size: 12px; color: #94a3b8; margin: 0 12px; font-family: monospace; }
-    .preview-content {
-      height: 380px; background: #f8fafc; position: relative; overflow: hidden;
-      display: flex; align-items: center; justify-content: center;
-    }
+    .preview-content { height: 380px; background: #f8fafc; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; }
     .preview-site { text-align: center; color: #94a3b8; font-size: 15px; }
     .preview-site h3 { color: #475569; font-size: 24px; margin-bottom: 8px; }
-
-    /* Fake chat widget inside preview */
-    .fake-widget {
-      position: absolute; bottom: 20px; right: 20px;
-      width: 300px; background: #fff; border-radius: 14px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.15); overflow: hidden;
-      font-family: -apple-system, sans-serif;
-    }
+    .fake-widget { position: absolute; bottom: 20px; right: 20px; width: 300px; background: #fff; border-radius: 14px; box-shadow: 0 8px 32px rgba(0,0,0,0.15); overflow: hidden; font-family: -apple-system, sans-serif; }
     .fw-header { background: var(--blue); padding: 12px 14px; color: #fff; }
     .fw-header-row { display: flex; align-items: center; gap: 8px; }
     .fw-avatar { width: 28px; height: 28px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; }
@@ -121,7 +100,6 @@
     .fw-typing span:nth-child(3) { animation-delay: 0.4s; }
     @keyframes bounce { 0%,80%,100% { transform: translateY(0); } 40% { transform: translateY(-5px); } }
 
-    /* FEATURES */
     section { padding: 96px 24px; }
     .section-inner { max-width: 1100px; margin: 0 auto; }
     .section-label { font-size: 13px; font-weight: 700; color: var(--blue); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; }
@@ -135,7 +113,6 @@
     .feature-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
     .feature-card p { font-size: 14px; color: var(--muted); line-height: 1.6; }
 
-    /* HOW IT WORKS */
     .hiw-bg { background: #f8fafc; }
     .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; position: relative; }
     .steps::before { content: ""; position: absolute; top: 28px; left: calc(12.5% + 20px); right: calc(12.5% + 20px); height: 2px; background: var(--border); z-index: 0; }
@@ -144,17 +121,35 @@
     .step h3 { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
     .step p { font-size: 14px; color: var(--muted); line-height: 1.6; }
 
-    /* SOCIAL PROOF */
-    .testimonials { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 48px; }
-    .testimonial { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; }
-    .stars { color: #f59e0b; font-size: 15px; margin-bottom: 14px; }
-    .testimonial blockquote { font-size: 15px; line-height: 1.7; color: var(--text); margin: 0 0 20px; }
-    .testimonial-author { display: flex; align-items: center; gap: 12px; }
-    .t-avatar { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; }
-    .t-name { font-size: 14px; font-weight: 700; }
-    .t-role { font-size: 13px; color: var(--muted); }
+    /* CUSTOMISATION SECTION */
+    .custom-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 48px; margin-bottom: 40px; }
+    .custom-card { background: #fff; border: 1px solid var(--border); border-radius: 16px; padding: 28px; display: flex; flex-direction: column; gap: 12px; transition: box-shadow 0.2s, transform 0.2s; }
+    .custom-card:hover { box-shadow: 0 8px 32px rgba(0,0,0,0.08); transform: translateY(-3px); }
+    .custom-icon-wrap { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .custom-card h3 { font-size: 16px; font-weight: 700; color: var(--text); margin: 0; }
+    .custom-card p { font-size: 14px; color: var(--muted); line-height: 1.6; margin: 0; }
+    .color-dots { display: flex; gap: 8px; margin-top: 4px; }
+    .color-dots div { width: 22px; height: 22px; border-radius: 50%; }
+    .name-examples { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+    .name-examples span { background: #f1f5f9; color: #334155; font-size: 13px; font-weight: 600; padding: 4px 12px; border-radius: 20px; }
+    .style-pills { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+    .style-pill { font-size: 12px; font-weight: 600; padding: 5px 12px; border-radius: 20px; border: 1px solid var(--border); color: var(--muted); background: #f8fafc; }
+    .style-pill.active { background: #fffbeb; color: #d97706; border-color: #fde68a; }
+    .lang-flags { display: flex; gap: 8px; font-size: 20px; margin-top: 4px; }
+    .position-demo { margin-top: 4px; }
+    .pos-screen { background: #f1f5f9; border-radius: 8px; height: 48px; position: relative; border: 1px solid var(--border); }
+    .pos-bubble { position: absolute; bottom: 6px; font-size: 18px; color: #cbd5e1; }
+    .pos-bubble.left { left: 8px; }
+    .pos-bubble.right { right: 8px; }
+    .pos-bubble.active { color: var(--blue); }
+    .greeting-preview { margin-top: 4px; }
+    .greeting-bubble { background: #f1f5f9; border-radius: 10px 10px 10px 2px; padding: 10px 14px; font-size: 13px; color: #334155; font-style: italic; display: inline-block; }
+    .custom-cta { background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); border-radius: 20px; padding: 36px 40px; display: flex; justify-content: space-between; align-items: center; gap: 24px; flex-wrap: wrap; }
+    .custom-cta h3 { font-size: 22px; font-weight: 700; color: #fff; margin-bottom: 8px; font-family: 'Instrument Serif', serif; }
+    .custom-cta p { font-size: 15px; color: rgba(255,255,255,0.6); margin: 0; }
+    .btn-white { background: #fff; color: var(--blue); }
+    .btn-white:hover { background: #f0f7ff; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
 
-    /* PRICING */
     .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 48px; }
     .pricing-card { border: 1px solid var(--border); border-radius: 18px; padding: 32px; position: relative; transition: transform 0.2s, box-shadow 0.2s; }
     .pricing-card:hover { transform: translateY(-4px); box-shadow: 0 16px 48px rgba(0,0,0,0.1); }
@@ -169,7 +164,6 @@
     .pricing-features li::before { content: "✓"; color: #22c55e; font-weight: 700; flex-shrink: 0; }
     .pricing-note { font-size: 12px; color: var(--muted); text-align: center; margin-top: 12px; }
 
-    /* FAQ */
     .faq-list { display: flex; flex-direction: column; gap: 0; max-width: 720px; }
     .faq-item { border-bottom: 1px solid var(--border); }
     .faq-q { padding: 20px 0; font-size: 16px; font-weight: 600; cursor: pointer; display: flex; justify-content: space-between; align-items: center; list-style: none; }
@@ -178,22 +172,11 @@
     .faq-a { font-size: 15px; color: var(--muted); line-height: 1.7; max-height: 0; overflow: hidden; transition: max-height 0.3s ease, padding 0.3s; }
     .faq-item.open .faq-a { max-height: 200px; padding-bottom: 20px; }
 
-    /* CTA BANNER */
-    .cta-banner {
-      background: linear-gradient(135deg, #1e3a8a 0%, var(--blue) 100%);
-      color: #fff; text-align: center; padding: 96px 24px;
-    }
+    .cta-banner { background: linear-gradient(135deg, #1e3a8a 0%, var(--blue) 100%); color: #fff; text-align: center; padding: 96px 24px; }
     .cta-banner h2 { color: #fff; margin-bottom: 16px; }
     .cta-banner p { color: rgba(255,255,255,0.8); font-size: 18px; max-width: 500px; margin: 0 auto 36px; }
-    .btn-white { background: #fff; color: var(--blue); }
-    .btn-white:hover { background: #f0f7ff; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
 
-    /* FOOTER */
-    footer {
-      border-top: 1px solid var(--border); padding: 48px;
-      display: flex; justify-content: space-between; align-items: center;
-      color: var(--muted); font-size: 13px;
-    }
+    footer { border-top: 1px solid var(--border); padding: 48px; display: flex; justify-content: space-between; align-items: center; color: var(--muted); font-size: 13px; }
     footer a { color: var(--muted); text-decoration: none; }
     footer a:hover { color: var(--text); }
     .footer-links { display: flex; gap: 24px; }
@@ -201,8 +184,9 @@
     @media (max-width: 768px) {
       nav { padding: 0 20px; }
       .nav-links { display: none; }
-      .features-grid, .steps, .testimonials, .pricing-grid { grid-template-columns: 1fr; }
+      .features-grid, .steps, .custom-grid, .pricing-grid { grid-template-columns: 1fr; }
       .steps::before { display: none; }
+      .custom-cta { flex-direction: column; text-align: center; }
       footer { flex-direction: column; gap: 16px; text-align: center; }
     }
   </style>
@@ -215,6 +199,7 @@
   <div class="nav-links">
     <a href="#features">Features</a>
     <a href="#how-it-works">How it works</a>
+    <a href="#customise">Customise</a>
     <a href="#pricing">Pricing</a>
     <a href="#faq">FAQ</a>
   </div>
@@ -234,7 +219,6 @@
     <a href="#how-it-works" class="btn btn-ghost btn-lg">See how it works</a>
   </div>
   <p class="hero-trust">No credit card required · <strong>14 days free</strong> · Cancel anytime</p>
-
   <div class="preview-wrap">
     <div class="preview-browser">
       <div class="preview-bar">
@@ -309,7 +293,7 @@
       <div class="feature-card">
         <div class="feature-icon">🎨</div>
         <h3>Matches your brand</h3>
-        <p>Customise the bot's name, colour, and position. It feels like a natural part of your website, not a third-party plugin.</p>
+        <p>Customise the bot's name, colour, position, language and response style — all from your dashboard with a live preview.</p>
       </div>
     </div>
   </div>
@@ -334,49 +318,111 @@
       </div>
       <div class="step">
         <div class="step-num">3</div>
-        <h3>Copy the snippet</h3>
-        <p>Grab your unique one-line embed code from your dashboard.</p>
+        <h3>Customise your bot</h3>
+        <p>Set your name, colour, language and response style with a live preview.</p>
       </div>
       <div class="step">
         <div class="step-num">4</div>
         <h3>Go live</h3>
-        <p>Paste it on your site. Your AI bot is live and answering instantly.</p>
+        <p>Paste your embed code on your site. Your AI bot is live instantly.</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- TESTIMONIALS -->
-<section>
+<!-- CUSTOMISATION -->
+<section id="customise">
   <div class="section-inner">
-    <div class="section-label">Social proof</div>
-    <h2>Businesses that never sleep anymore</h2>
-    <div class="testimonials">
-      <div class="testimonial">
-        <div class="stars">★★★★★</div>
-        <blockquote>"We used to spend 2 hours every morning answering the same questions. Now Nomi handles them and I wake up to zero support emails."</blockquote>
-        <div class="testimonial-author">
-          <div class="t-avatar" style="background:#fef3c7">🛍️</div>
-          <div><div class="t-name">Marta V.</div><div class="t-role">Founder, online clothing boutique</div></div>
+    <div class="section-label">Fully customisable</div>
+    <h2>Make it yours.<br/>Down to every detail.</h2>
+    <p class="section-sub">Nomi adapts to your brand — not the other way around. Configure everything from your dashboard with a live preview.</p>
+
+    <div class="custom-grid">
+      <div class="custom-card">
+        <div class="custom-icon-wrap" style="background:#eff6ff">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/></svg>
+        </div>
+        <h3>Your brand colours</h3>
+        <p>Pick from presets or enter any hex code. The chat bubble, header and buttons all update instantly to match your brand.</p>
+        <div class="color-dots">
+          <div style="background:#2563eb"></div>
+          <div style="background:#7c3aed"></div>
+          <div style="background:#db2777"></div>
+          <div style="background:#059669"></div>
+          <div style="background:#d97706"></div>
+          <div style="background:#0f172a"></div>
         </div>
       </div>
-      <div class="testimonial">
-        <div class="stars">★★★★★</div>
-        <blockquote>"Setup took 8 minutes. I uploaded our help docs, pasted the code, and it was running. Our customers love getting answers instantly at midnight."</blockquote>
-        <div class="testimonial-author">
-          <div class="t-avatar" style="background:#dcfce7">🏋️</div>
-          <div><div class="t-name">Tom K.</div><div class="t-role">CEO, fitness app startup</div></div>
+
+      <div class="custom-card">
+        <div class="custom-icon-wrap" style="background:#f0fdf4">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <h3>Custom bot name</h3>
+        <p>Name your bot anything you like. Customers will never know it's AI unless you tell them.</p>
+        <div class="name-examples">
+          <span>Lisa</span><span>Support</span><span>Aria</span><span>Max</span>
         </div>
       </div>
-      <div class="testimonial">
-        <div class="stars">★★★★★</div>
-        <blockquote>"The ROI is obvious. We were paying €1,800/mo for a part-time support person. Now we pay €299 and get better, faster, 24/7 coverage."</blockquote>
-        <div class="testimonial-author">
-          <div class="t-avatar" style="background:#ede9fe">🏠</div>
-          <div><div class="t-name">Lena B.</div><div class="t-role">Director, property management agency</div></div>
+
+      <div class="custom-card">
+        <div class="custom-icon-wrap" style="background:#fffbeb">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <h3>Response style</h3>
+        <p>Choose how your bot communicates — short and direct, or thorough and detailed.</p>
+        <div class="style-pills">
+          <div class="style-pill active">⚡ Concise</div>
+          <div class="style-pill">✦ Balanced</div>
+          <div class="style-pill">📖 Detailed</div>
+        </div>
+      </div>
+
+      <div class="custom-card">
+        <div class="custom-icon-wrap" style="background:#fdf4ff">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#9333ea" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        </div>
+        <h3>8 languages</h3>
+        <p>Set the widget interface in your customers' language. The AI automatically replies in whatever language they write in.</p>
+        <div class="lang-flags">
+          <span>🇬🇧</span><span>🇳🇱</span><span>🇩🇪</span><span>🇫🇷</span><span>🇪🇸</span><span>🇮🇹</span><span>🇵🇹</span><span>🇸🇦</span>
+        </div>
+      </div>
+
+      <div class="custom-card">
+        <div class="custom-icon-wrap" style="background:#fff1f2">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e11d48" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M3 9h6"/></svg>
+        </div>
+        <h3>Widget position</h3>
+        <p>Place the chat bubble in the bottom left or bottom right corner — whichever works best with your layout.</p>
+        <div class="position-demo">
+          <div class="pos-screen">
+            <div class="pos-bubble left">◉</div>
+            <div class="pos-bubble right active">◉</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="custom-card">
+        <div class="custom-icon-wrap" style="background:#f0f9ff">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0891b2" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        </div>
+        <h3>Custom greeting</h3>
+        <p>Set the first message your bot sends. Make it warm, on-brand, and specific to your business.</p>
+        <div class="greeting-preview">
+          <div class="greeting-bubble">"Hi! How can I help you today? 👋"</div>
         </div>
       </div>
     </div>
+
+    <div class="custom-cta">
+      <div>
+        <h3>See it all in the dashboard</h3>
+        <p>Every change shows in a live preview before you publish. No guessing, no refreshing.</p>
+      </div>
+      <a href="https://app.nomisupport.com" class="btn btn-white btn-lg">Open the dashboard →</a>
+    </div>
+
   </div>
 </section>
 
@@ -461,6 +507,10 @@
         <div class="faq-q">Can I cancel anytime?</div>
         <div class="faq-a">Absolutely. Cancel from your dashboard at any time with no cancellation fees. Your bot will remain active until the end of the billing period.</div>
       </div>
+      <div class="faq-item">
+        <div class="faq-q">Can I customise how the bot looks and responds?</div>
+        <div class="faq-a">Yes — fully. From your dashboard you can set the bot's name, colour, opening message, response style, language, and position on the page. A live preview updates as you make changes so you see exactly what your customers will see.</div>
+      </div>
     </div>
   </div>
 </section>
@@ -469,7 +519,7 @@
 <section class="cta-banner">
   <div class="section-inner">
     <h2>Ready to stop answering the same questions?</h2>
-    <p>Join hundreds of businesses running support on autopilot. Start free — no credit card needed.</p>
+    <p>Start free for 14 days — no credit card needed.</p>
     <a href="https://app.nomisupport.com" class="btn btn-white btn-lg">Start your 14-day free trial →</a>
   </div>
 </section>
@@ -480,14 +530,12 @@
   <div class="footer-links">
     <a href="/privacy.html">Privacy</a>
     <a href="/terms.html">Terms</a>
-    
     <a href="/contact.html">Contact</a>
   </div>
   <div>© 2025 Nomi. All rights reserved.</div>
 </footer>
 
 <script>
-  // FAQ accordion
   document.querySelectorAll(".faq-q").forEach(q => {
     q.addEventListener("click", () => {
       const item = q.parentElement;
@@ -497,7 +545,6 @@
     });
   });
 
-  // Animate typing indicator in hero preview
   setTimeout(() => {
     const typing = document.querySelector(".fw-typing").parentElement;
     typing.innerHTML = "Returns are free within 30 days. Just email us and we'll send a prepaid label. 📦";

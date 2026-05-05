@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
 from pydantic import BaseModel
+from datetime import datetime, timezone
 from app.database import get_db
 from app.models import Client, ChatSession, ChatMessage
 from app.auth import get_current_client
@@ -17,13 +18,24 @@ class ClientProfile(BaseModel):
     subscription_status: str
     chat_count_this_month: int
     embed_code: str
+    trial_days_remaining: int | None
 
 class UpdateProfileRequest(BaseModel):
     company_name: str | None = None
 
 @router.get("/me", response_model=ClientProfile)
 async def get_profile(client: Client = Depends(get_current_client)):
-    embed_code = f'<script src="{settings.app_url}/widget.js" data-client-id="{client.id}"></script>'
+    embed_code = f'<script src="https://api.nomisupport.com/widget.js" data-client-id="{client.id}"></script>'
+
+    trial_days_remaining = None
+    if client.subscription_status == "trialing" and client.trial_ends_at:
+        now = datetime.now(timezone.utc)
+        trial_end = client.trial_ends_at
+        if trial_end.tzinfo is None:
+            trial_end = trial_end.replace(tzinfo=timezone.utc)
+        remaining = (trial_end - now).days
+        trial_days_remaining = max(0, remaining)
+
     return ClientProfile(
         id=str(client.id),
         email=client.email,
@@ -32,6 +44,7 @@ async def get_profile(client: Client = Depends(get_current_client)):
         subscription_status=client.subscription_status,
         chat_count_this_month=client.chat_count_this_month,
         embed_code=embed_code,
+        trial_days_remaining=trial_days_remaining,
     )
 
 @router.patch("/me")
@@ -50,14 +63,11 @@ async def get_analytics(
     client: Client = Depends(get_current_client),
     db: AsyncSession = Depends(get_db),
 ):
-    """Return chat volume and recent conversation previews."""
-    # Total sessions
     sessions_result = await db.execute(
         select(func.count()).where(ChatSession.client_id == client.id)
     )
     total_sessions = sessions_result.scalar()
 
-    # Total messages
     messages_result = await db.execute(
         select(func.count(ChatMessage.id))
         .join(ChatSession, ChatMessage.session_id == ChatSession.id)
@@ -65,7 +75,6 @@ async def get_analytics(
     )
     total_messages = messages_result.scalar()
 
-    # Recent sessions with first user message
     recent_result = await db.execute(
         select(ChatSession)
         .where(ChatSession.client_id == client.id)

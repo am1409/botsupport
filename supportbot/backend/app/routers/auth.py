@@ -3,12 +3,15 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from pydantic import BaseModel, EmailStr
+from datetime import datetime, timezone, timedelta
 from app.database import get_db
 from app.models import Client
 from app.auth import hash_password, verify_password, create_access_token
 import uuid
 
 router = APIRouter()
+
+TRIAL_DAYS = 14
 
 class RegisterRequest(BaseModel):
     email: EmailStr
@@ -26,12 +29,15 @@ async def register(req: RegisterRequest, db: AsyncSession = Depends(get_db)):
     if existing.scalar_one_or_none():
         raise HTTPException(status_code=400, detail="Email already registered")
 
+    trial_ends_at = datetime.now(timezone.utc) + timedelta(days=TRIAL_DAYS)
+
     client = Client(
         id=uuid.uuid4(),
         email=req.email,
         hashed_password=hash_password(req.password),
         company_name=req.company_name,
         subscription_status="trialing",
+        trial_ends_at=trial_ends_at,
     )
     db.add(client)
     await db.commit()

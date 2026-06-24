@@ -4,6 +4,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from app.routers import chat, clients, ingest, auth, billing, aliexpress
 from app.database import init_db
+from fastapi.responses import HTMLResponse
 import os
 
 app = FastAPI(
@@ -19,6 +20,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.get("/scorer", response_class=HTMLResponse)
+async def scorer():
+    with open("scorer.html") as f:
+        return f.read()
 
 @app.on_event("startup")
 async def startup():

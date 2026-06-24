@@ -5,6 +5,8 @@ router = APIRouter()
 
 RAPIDAPI_KEY = "eb4f1e5a08msh2d0d2cae2651ceap1a2460jsn1e30452a1e57"
 
+from fastapi.responses import JSONResponse
+
 @router.get("/aliexpress")
 async def aliexpress_search(q: str = "trending"):
     url = "https://free-aliexpress-all-data.p.rapidapi.com/api/aliexpress/search"
@@ -23,4 +25,7 @@ async def aliexpress_search(q: str = "trending"):
     }
     async with httpx.AsyncClient() as client:
         response = await client.get(url, params=params, headers=headers)
-    return response.json()
+    return JSONResponse(
+        content=response.json(),
+        headers={"Access-Control-Allow-Origin": "*"}
+    )

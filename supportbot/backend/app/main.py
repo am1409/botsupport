@@ -23,7 +23,8 @@ app.add_middleware(
 
 @app.get("/scorer", response_class=HTMLResponse)
 async def scorer():
-    with open("scorer.html") as f:
+    path = os.path.join(os.path.dirname(__file__), "scorer.html")
+    with open(path) as f:
         return f.read()
 
 @app.on_event("startup")

@@ -12,7 +12,7 @@ async def aliexpress_search(q: str = "trending"):
         "q": q,
         "language": "en",
         "currency": "EUR",
-        "sort": "orders_desc",
+        "sort": "LAST_VOLUME_DESC",
         "page": "1",
         "page_size": "12",
         "ship_to": "NL"

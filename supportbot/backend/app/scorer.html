@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Nomi Product Scorer</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f3;color:#1a1a1a;padding:2rem 1rem;min-height:100vh}
+.container{max-width:820px;margin:0 auto}
+h1{font-size:22px;font-weight:500;margin-bottom:4px}
+.subtitle{font-size:13px;color:#888;margin-bottom:2rem}
+.tabs{display:flex;gap:2px;border-bottom:1px solid #e0e0e0;margin-bottom:1.5rem}
+.tab{padding:8px 18px;font-size:13px;cursor:pointer;border:none;background:none;border-bottom:2px solid transparent;color:#888;font-family:inherit}
+.tab.active{color:#1a1a1a;border-bottom:2px solid #3266ad;font-weight:500}
+.panel{display:none}.panel.active{display:block}
+.alert{padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:14px;line-height:1.6}
+.alert-info{background:#e8f0fb;color:#1a56a0}
+.alert-warn{background:#fef3cd;color:#856404}
+.alert-err{background:#fde8e8;color:#9b1c1c}
+.alert-ok{background:#e8f5e9;color:#1b5e20}
+.search-row{display:flex;gap:8px;margin-bottom:6px}
+.search-row input{flex:1;padding:9px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;font-family:inherit;outline:none}
+.search-row input:focus{border-color:#3266ad}
+.tip{font-size:11px;color:#999;margin-bottom:1rem}
+.btn{cursor:pointer;padding:9px 20px;border-radius:8px;font-size:14px;font-weight:500;border:1px solid #ddd;background:#fff;color:#1a1a1a;font-family:inherit;transition:background 0.15s}
+.btn:hover{background:#f5f5f3}
+.btn-primary{background:#3266ad;color:#fff;border-color:#3266ad}
+.btn-primary:hover{background:#185FA5}
+.btn:disabled{opacity:0.5;cursor:not-allowed}
+.product-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem}
+@media(max-width:500px){.product-grid{grid-template-columns:1fr}}
+.product-card{border:1px solid #e0e0e0;border-radius:10px;padding:12px;cursor:pointer;background:#fff;transition:border-color 0.15s}
+.product-card:hover{border-color:#aaa}
+.product-card.selected{border:2px solid #3266ad}
+.product-img{width:56px;height:56px;object-fit:cover;border-radius:6px;float:left;margin-right:10px}
+.product-title{font-size:12px;font-weight:500;line-height:1.4;margin-bottom:4px}
+.product-meta{font-size:11px;color:#888}
+.divider{border:none;border-top:1px solid #e8e8e8;margin:1.2rem 0}
+.section-title{font-size:14px;font-weight:500;margin-bottom:10px}
+.price-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.field{display:flex;flex-direction:column;gap:4px}
+.field label{font-size:12px;color:#666}
+.field input{padding:8px 10px;border:1px solid #ddd;border-radius:8px;font-size:13px;font-family:inherit;outline:none}
+.field input:focus{border-color:#3266ad}
+.margin-bar{background:#f5f5f3;border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:12px}
+.card{background:#fff;border:1px solid #e0e0e0;border-radius:12px;padding:1rem 1.25rem;margin-bottom:10px}
+.metric-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:1rem}
+@media(max-width:500px){.metric-grid{grid-template-columns:repeat(3,1fr)}}
+.metric-card{background:#f5f5f3;border-radius:8px;padding:10px 8px;text-align:center}
+.mc-label{font-size:11px;color:#888;margin-bottom:4px}
+.mc-val{font-size:18px;font-weight:500}
+.mc-max{font-size:10px;color:#aaa}
+.total-score{font-size:40px;font-weight:500}
+.verdict{font-size:13px;font-weight:500;padding:4px 14px;border-radius:20px;display:inline-block;margin-left:10px;vertical-align:middle}
+.score-bar-wrap{height:6px;background:#f0f0f0;border-radius:3px;margin-top:5px}
+.score-bar{height:6px;border-radius:3px;transition:width 0.4s}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid #ddd;border-top-color:#3266ad;border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.lb-row{display:grid;grid-template-columns:28px 1fr 55px 65px 80px 32px;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:13px}
+.lb-row:last-child{border-bottom:none}
+.lb-head{font-size:11px;color:#999;font-weight:500}
+.pill{font-size:11px;font-weight:500;padding:3px 10px;border-radius:20px}
+.flags{margin-top:12px;font-size:12px;line-height:2}
+.rawdata{margin-top:10px;background:#f5f5f3;border-radius:8px;padding:10px 14px;font-size:12px;color:#666;line-height:1.8}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Product Scorer</h1>
+  <p class="subtitle">Search AliExpress, score products, build your leaderboard</p>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('search')">Search & score</button>
+    <button class="tab" onclick="switchTab('board')">Leaderboard (<span id="lb-count">0</span>)</button>
+  </div>
+
+  <div class="panel active" id="panel-search">
+    <div class="alert alert-info">Search any keyword — live AliExpress results sorted by sales volume. Pick a product, set your selling price, get a score.</div>
+    <div class="search-row">
+      <input type="text" id="kw" placeholder="e.g. posture corrector, led strip, phone mount..." onkeydown="if(event.key==='Enter')doSearch()"/>
+      <button class="btn btn-primary" id="search-btn" onclick="doSearch()">Search</button>
+    </div>
+    <div class="tip">Sorted by total sales — highest demand first.</div>
+    <div id="search-status"></div>
+
+    <div id="results-area" style="display:none">
+      <div class="section-title" id="results-title"></div>
+      <div class="product-grid" id="product-grid"></div>
+
+      <div id="selected-area" style="display:none">
+        <hr class="divider">
+        <div class="section-title">Set your pricing</div>
+        <div class="price-row">
+          <div class="field">
+            <label>Your selling price (€)</label>
+            <input type="number" id="sell-price" placeholder="e.g. 29.95" min="0" step="0.5" oninput="updateMargin()"/>
+          </div>
+          <div class="field">
+            <label>Est. ad spend per order (€)</label>
+            <input type="number" id="ad-spend" value="6" min="0" step="0.5" oninput="updateMargin()"/>
+          </div>
+        </div>
+        <div class="margin-bar">
+          <span style="color:#888">Supplier cost: </span><span id="mp-cost" style="font-weight:500">—</span>
+          <span style="color:#888;margin-left:14px">Net margin: </span><span id="mp-margin" style="font-weight:500">—</span>
+          <span style="color:#888;margin-left:14px">Profit/order: </span><span id="mp-profit" style="font-weight:500">—</span>
+        </div>
+        <button class="btn btn-primary" onclick="doScore()">Score this product</button>
+      </div>
+
+      <div id="score-result" style="display:none;margin-top:1.5rem">
+        <hr class="divider">
+        <div class="card">
+          <div style="display:flex;align-items:baseline;margin-bottom:1rem;flex-wrap:wrap;gap:8px">
+            <span class="total-score" id="r-total">—</span>
+            <span style="font-size:13px;color:#888">/100</span>
+            <span class="verdict" id="r-verdict"></span>
+            <span style="font-size:12px;color:#888;margin-left:auto;max-width:220px;text-align:right;line-height:1.4" id="r-name"></span>
+          </div>
+          <div class="metric-grid">
+            <div class="metric-card"><div class="mc-label">Trend</div><div class="mc-val" id="r-s1">—</div><div class="mc-max">/20</div></div>
+            <div class="metric-card"><div class="mc-label">Margin</div><div class="mc-val" id="r-s2">—</div><div class="mc-max">/25</div></div>
+            <div class="metric-card"><div class="mc-label">Competition</div><div class="mc-val" id="r-s3">—</div><div class="mc-max">/20</div></div>
+            <div class="metric-card"><div class="mc-label">Quality</div><div class="mc-val" id="r-s4">—</div><div class="mc-max">/20</div></div>
+            <div class="metric-card"><div class="mc-label">Logistics</div><div class="mc-val" id="r-s5">—</div><div class="mc-max">/15</div></div>
+          </div>
+          <div id="r-bars"></div>
+          <div class="flags" id="r-flags"></div>
+          <div class="rawdata" id="r-rawdata"></div>
+          <div style="margin-top:14px;display:flex;gap:8px">
+            <button class="btn btn-primary" onclick="saveProduct()">Save to leaderboard</button>
+            <button class="btn" onclick="document.getElementById('score-result').style.display='none'">Dismiss</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-board">
+    <div id="lb-empty" style="color:#888;font-size:13px;padding:2rem 0">No products saved yet. Score a product and save it to see it here.</div>
+    <div id="lb-table" style="display:none">
+      <div class="lb-row lb-head">
+        <div>#</div><div>Product</div><div style="text-align:right">Score</div><div style="text-align:center">Margin</div><div style="text-align:center">Verdict</div><div></div>
+      </div>
+      <div id="lb-rows"></div>
+    </div>
+    <div style="margin-top:1rem;display:none" id="lb-actions">
+      <button class="btn" onclick="clearBoard()">Clear all</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = '/aliexpress';
+let products = [], selectedProduct = null, lastScore = null;
+
+function switchTab(t){
+  document.querySelectorAll('.tab').forEach((el,i)=>el.classList.toggle('active',['search','board'][i]===t));
+  document.querySelectorAll('.panel').forEach(el=>el.classList.remove('active'));
+  document.getElementById('panel-'+t).classList.add('active');
+}
+
+function setStatus(msg,type=''){
+  const el=document.getElementById('search-status');
+  if(!msg){el.innerHTML='';return;}
+  const cls={err:'alert-err',warn:'alert-warn',ok:'alert-ok'}[type]||'alert-info';
+  el.innerHTML=`<div class="alert ${cls}">${msg}</div>`;
+}
+
+function getPrice(item){return parseFloat(String(item.price||0).replace(/[^0-9.]/g,''))||0;}
+function getOrders(item){return parseInt(String(item.orders||0).replace(/[^0-9]/g,''))||0;}
+function getRating(item){
+  const raw=parseFloat(String(item.rating||'0').replace('%',''))||0;
+  return raw>5?raw/20:raw;
+}
+function getImage(item){return item.image||item.imageUrl||'';}
+function getTitle(item){return item.title||item.product_title||'Product';}
+
+async function doSearch(){
+  const kw=document.getElementById('kw').value.trim();
+  if(!kw)return;
+  const btn=document.getElementById('search-btn');
+  btn.disabled=true;
+  btn.innerHTML='<span class="spinner"></span>Searching...';
+  document.getElementById('results-area').style.display='none';
+  document.getElementById('score-result').style.display='none';
+  setStatus('<span class="spinner"></span>Fetching from AliExpress...');
+  try{
+    const res=await fetch(API+'?q='+encodeURIComponent(kw));
+    if(!res.ok)throw new Error('Server error '+res.status);
+    const data=await res.json();
+    const items=data?.products||[];
+    if(!items.length){setStatus('No products found for "'+kw+'"','warn');btn.disabled=false;btn.textContent='Search';return;}
+    setStatus(items.length+' products found','ok');
+    renderResults(items.slice(0,10),kw);
+  }catch(e){setStatus('Error: '+e.message,'err');}
+  btn.disabled=false;btn.textContent='Search';
+}
+
+function renderResults(items,kw){
+  window._items=items;
+  document.getElementById('results-title').textContent=items.length+' results for "'+kw+'" — click one to select';
+  document.getElementById('product-grid').innerHTML=items.map((item,i)=>{
+    const price=getPrice(item),orders=getOrders(item),rating=getRating(item),img=getImage(item),title=getTitle(item);
+    return`<div class="product-card" onclick="selectProduct(${i})" id="pc-${i}">
+      ${img?`<img src="${img}" class="product-img" alt="" onerror="this.style.display='none'"/>`:''}
+      <div style="overflow:hidden">
+        <div class="product-title">${title.slice(0,75)}${title.length>75?'...':''}</div>
+        <div class="product-meta">Cost: €${price.toFixed(2)}${orders?' · '+orders.toLocaleString()+' orders':''}${rating?' · ⭐ '+rating.toFixed(1):''}</div>
+      </div><div style="clear:both"></div>
+    </div>`;
+  }).join('');
+  document.getElementById('selected-area').style.display='none';
+  document.getElementById('results-area').style.display='block';
+}
+
+function selectProduct(idx){
+  document.querySelectorAll('.product-card').forEach(c=>c.classList.remove('selected'));
+  document.getElementById('pc-'+idx).classList.add('selected');
+  selectedProduct=window._items[idx];
+  selectedProduct._cost=getPrice(selectedProduct);
+  document.getElementById('mp-cost').textContent='€'+selectedProduct._cost.toFixed(2);
+  document.getElementById('sell-price').value='';
+  document.getElementById('mp-margin').textContent='—';
+  document.getElementById('mp-profit').textContent='—';
+  document.getElementById('selected-area').style.display='block';
+  document.getElementById('score-result').style.display='none';
+  document.getElementById('selected-area').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function updateMargin(){
+  if(!selectedProduct)return;
+  const cost=selectedProduct._cost||0,sell=parseFloat(document.getElementById('sell-price').value)||0,ads=parseFloat(document.getElementById('ad-spend').value)||0;
+  if(sell>0){
+    const net=sell-cost-(sell*0.025)-ads,margin=net/sell*100;
+    const mEl=document.getElementById('mp-margin');
+    mEl.textContent=Math.round(margin)+'%';
+    mEl.style.color=margin>=40?'#2e7d32':margin>=25?'#e65100':'#c62828';
+    document.getElementById('mp-profit').textContent='€'+net.toFixed(2);
+  }
+}
+
+function verdictStyle(t){
+  if(t>=80)return{text:'Strong pick',bg:'#e8f5e9',color:'#1b5e20'};
+  if(t>=65)return{text:'Good',bg:'#e8f5e9',color:'#1b5e20'};
+  if(t>=50)return{text:'Possible',bg:'#fff8e1',color:'#e65100'};
+  if(t>=35)return{text:'Risky',bg:'#fff8e1',color:'#e65100'};
+  return{text:'Skip',bg:'#fde8e8',color:'#9b1c1c'};
+}
+
+function calcScores(item,cost,sell,ads){
+  const orders=getOrders(item),rating=getRating(item),title=getTitle(item).toLowerCase();
+  const s1=orders>=50000?20:orders>=20000?18:orders>=10000?15:orders>=5000?12:orders>=1000?8:orders>=100?4:2;
+  let s2=0;
+  if(sell>0){
+    const net=sell-cost-(sell*0.025)-ads,m=net/sell*100;
+    s2=m>=50?25:m>=40?22:m>=30?17:m>=20?11:m>=10?5:0;
+    if((sell-cost-(sell*0.025)-ads)<3&&s2>0)s2=Math.max(0,s2-4);
+  }
+  let s3=orders>=100000?2:orders>=50000?5:orders>=20000?8:orders>=5000?13:orders>=1000?17:20;
+  if(rating>0&&rating<4.5)s3=Math.min(20,s3+2);
+  let s4=rating>=4.8?20:rating>=4.6?17:rating>=4.4?13:rating>=4.0?8:rating>0?3:10;
+  if(['clothing','dress','shoe','shirt','pant','fashion','bra'].some(w=>title.includes(w)))s4=Math.max(0,s4-4);
+  if(['battery','laser','charger','electric','voltage'].some(w=>title.includes(w)))s4=Math.max(0,s4-4);
+  let s5=cost<3?14:cost<8?12:cost<20?10:cost<40?7:4;
+  if(['furniture','mattress','bicycle','treadmill','sofa'].some(w=>title.includes(w)))s5=Math.max(0,s5-5);
+  const total=Math.min(100,Math.max(0,s1+s2+s3+s4+s5));
+  const net=sell>0?sell-cost-(sell*0.025)-ads:0;
+  return{s1,s2,s3,s4,s5,total,margin:sell>0?Math.round(net/sell*100):0,net,orders,rating};
+}
+
+function doScore(){
+  if(!selectedProduct)return;
+  const sell=parseFloat(document.getElementById('sell-price').value)||0;
+  const ads=parseFloat(document.getElementById('ad-spend').value)||6;
+  if(!sell){alert('Please enter your selling price first.');return;}
+  const cost=selectedProduct._cost||0;
+  const sc=calcScores(selectedProduct,cost,sell,ads);
+  const title=getTitle(selectedProduct);
+  const v=verdictStyle(sc.total);
+
+  document.getElementById('r-total').textContent=sc.total;
+  document.getElementById('r-name').textContent=title.slice(0,55)+(title.length>55?'...':'');
+  ['s1','s2','s3','s4','s5'].forEach(k=>document.getElementById('r-'+k).textContent=sc[k]);
+
+  const vEl=document.getElementById('r-verdict');
+  vEl.textContent=v.text;
+  vEl.style.cssText=`background:${v.bg};color:${v.color};font-size:13px;font-weight:500;padding:4px 14px;border-radius:20px;display:inline-block;margin-left:10px;vertical-align:middle`;
+
+  const dims=[{k:'s1',mx:20,lbl:'Trend & demand'},{k:'s2',mx:25,lbl:'Profit margin'},{k:'s3',mx:20,lbl:'Competition room'},{k:'s4',mx:20,lbl:'Quality & risk'},{k:'s5',mx:15,lbl:'Logistics'}];
+  document.getElementById('r-bars').innerHTML=dims.map(d=>{
+    const pct=Math.round(sc[d.k]/d.mx*100);
+    const col=pct>=70?'#2e7d32':pct>=45?'#e65100':'#c62828';
+    return`<div style="margin-bottom:7px"><div style="display:flex;justify-content:space-between;font-size:11px;color:#888;margin-bottom:2px"><span>${d.lbl}</span><span>${sc[d.k]}/${d.mx}</span></div><div class="score-bar-wrap"><div class="score-bar" style="width:${pct}%;background:${col}"></div></div></div>`;
+  }).join('');
+
+  const flags=[];
+  if(sc.margin<20)flags.push('⚠️ Net margin below 20% — raise your price or find a cheaper supplier');
+  if(sc.orders>50000)flags.push('⚠️ Very high order count — market may be saturated');
+  if(sc.rating>0&&sc.rating<4.4)flags.push('⚠️ Low supplier rating — quality complaints likely');
+  if(cost>40)flags.push('⚠️ High supplier cost — margins will be tight');
+  if(sc.total>=65&&sc.margin>=30)flags.push('✅ Strong margin + good score — worth testing with a small ad budget');
+  if(sc.s3>=16)flags.push('✅ Low competition — good window to enter this niche');
+  if(sc.s1>=15&&sc.s3>=13)flags.push('✅ High demand with manageable competition — solid opportunity');
+  document.getElementById('r-flags').innerHTML=flags.join('<br>')||'<span style="color:#aaa">No flags.</span>';
+  document.getElementById('r-rawdata').innerHTML=`Orders: <strong>${sc.orders.toLocaleString()}</strong> · Rating: <strong>${selectedProduct.rating||'n/a'}</strong> · Supplier cost: <strong>€${cost.toFixed(2)}</strong> · Your price: <strong>€${sell.toFixed(2)}</strong> · Net/order: <strong>€${sc.net.toFixed(2)}</strong> · Discount: <strong>${selectedProduct.discount||'—'}</strong>`;
+
+  lastScore={name:title.slice(0,60),scores:sc,margin:sc.margin,net:sc.net.toFixed(2),cost:cost.toFixed(2),sell:sell.toFixed(2)};
+  document.getElementById('score-result').style.display='block';
+  document.getElementById('score-result').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function saveProduct(){
+  if(!lastScore)return;
+  products.push({...lastScore,id:Date.now()});
+  products.sort((a,b)=>b.scores.total-a.scores.total);
+  renderBoard();
+  document.getElementById('lb-count').textContent=products.length;
+  switchTab('board');
+}
+
+function renderBoard(){
+  if(!products.length){
+    document.getElementById('lb-empty').style.display='block';
+    document.getElementById('lb-table').style.display='none';
+    document.getElementById('lb-actions').style.display='none';
+    return;
+  }
+  document.getElementById('lb-empty').style.display='none';
+  document.getElementById('lb-table').style.display='block';
+  document.getElementById('lb-actions').style.display='block';
+  const medals=['🥇','🥈','🥉'];
+  document.getElementById('lb-rows').innerHTML=products.map((p,i)=>{
+    const t=p.scores.total,v=verdictStyle(t);
+    const badge=i<3?medals[i]:`<span style="font-size:12px;color:#aaa">${i+1}</span>`;
+    return`<div class="lb-row">
+      <div>${badge}</div>
+      <div style="font-weight:500;font-size:12px;line-height:1.4">${p.name.slice(0,45)}${p.name.length>45?'...':''}<br><span style="font-size:11px;color:#aaa;font-weight:400">€${p.cost} cost · €${p.sell} sell</span></div>
+      <div style="text-align:right;font-size:18px;font-weight:500;color:${v.color}">${t}</div>
+      <div style="text-align:center;font-size:13px;color:${p.margin>=30?'#2e7d32':p.margin>=20?'#e65100':'#c62828'}">${p.margin}%</div>
+      <div style="text-align:center"><span class="pill" style="background:${v.bg};color:${v.color}">${v.text}</span></div>
+      <div><button style="background:none;border:none;cursor:pointer;color:#ccc;font-size:18px;line-height:1" onclick="removeProduct(${p.id})">×</button></div>
+    </div>`;
+  }).join('');
+}
+
+function removeProduct(id){
+  const idx=products.findIndex(p=>p.id===id);
+  if(idx>-1){products.splice(idx,1);renderBoard();document.getElementById('lb-count').textContent=products.length;}
+}
+
+function clearBoard(){
+  if(confirm('Remove all saved products?')){products=[];renderBoard();document.getElementById('lb-count').textContent=0;}
+}
+</script>
+</body>
+</html>

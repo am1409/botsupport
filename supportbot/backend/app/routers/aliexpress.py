@@ -18,19 +18,16 @@ async def aliexpress_options():
 
 @router.get("/aliexpress")
 async def aliexpress_search(q: str = "trending"):
-    url = "https://free-aliexpress-all-data.p.rapidapi.com/api/aliexpress/search"
+    url = "https://aliexpress-datahub.p.rapidapi.com/item_search_2"
     params = {
         "q": q,
-        "language": "en",
-        "currency": "EUR",
-        "sort": "LAST_VOLUME_DESC",
         "page": "1",
-        "page_size": "12",
-        "ship_to": "NL"
+        "sort": "default"
     }
     headers = {
+        "Content-Type": "application/json",
         "x-rapidapi-key": RAPIDAPI_KEY,
-        "x-rapidapi-host": "free-aliexpress-all-data.p.rapidapi.com"
+        "x-rapidapi-host": "aliexpress-datahub.p.rapidapi.com"
     }
     async with httpx.AsyncClient() as client:
         response = await client.get(url, params=params, headers=headers)

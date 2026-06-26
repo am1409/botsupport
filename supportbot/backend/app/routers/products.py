@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
 from app.database import get_db
-from app.models.shop import ShopProduct, ShopOrder
+from app.models import ShopProduct, ShopOrder
 from pydantic import BaseModel
 from typing import Optional, List
 

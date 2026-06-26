@@ -12,7 +12,7 @@ from sqlalchemy.sql import func
 # That ensures the tables get created on startup
 
 try:
-    from app.database import Base
+    from app.models import Base
 except ImportError:
     from sqlalchemy.orm import declarative_base
     Base = declarative_base()

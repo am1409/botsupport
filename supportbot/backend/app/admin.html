@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Velo Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --black:#0D0D0D;--white:#fff;--bg:#F7F5F0;--sand:#E8E0D0;
+  --accent:#C9410A;--slate:#6B7280;--green:#16a34a;--red:#dc2626;
+  --serif:'DM Serif Display',serif;--sans:'Inter',sans-serif;--mono:'DM Mono',monospace;
+  --r:6px;--t:.18s ease;
+}
+body{font-family:var(--sans);background:var(--bg);color:var(--black);-webkit-font-smoothing:antialiased}
+/* AUTH */
+.auth-overlay{position:fixed;inset:0;background:var(--black);display:flex;align-items:center;justify-content:center;z-index:999}
+.auth-box{background:var(--bg);border-radius:14px;padding:2.5rem;width:340px;text-align:center}
+.auth-logo{font-family:var(--serif);font-size:28px;margin-bottom:.25rem}
+.auth-logo span{color:var(--accent)}
+.auth-sub{font-size:13px;color:var(--slate);margin-bottom:2rem}
+.auth-input{width:100%;padding:11px 14px;border:1.5px solid var(--sand);border-radius:var(--r);font-size:14px;font-family:var(--sans);background:var(--white);outline:none;text-align:center;letter-spacing:3px;margin-bottom:1rem;transition:border-color var(--t)}
+.auth-input:focus{border-color:var(--black)}
+.auth-btn{width:100%;padding:12px;background:var(--black);color:var(--white);border:none;border-radius:var(--r);font-size:14px;font-weight:500;cursor:pointer;transition:background var(--t)}
+.auth-btn:hover{background:#333}
+.auth-err{font-size:12px;color:var(--red);margin-top:.5rem;display:none}
+/* NAV */
+nav{background:var(--black);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:60px;position:sticky;top:0;z-index:50}
+.nav-logo{font-family:var(--serif);font-size:20px;color:var(--white)}
+.nav-logo span{color:var(--accent)}
+.nav-links{display:flex;gap:1.5rem}
+.nav-links a{font-size:13px;color:#9ca3af;text-decoration:none;cursor:pointer;transition:color var(--t)}
+.nav-links a:hover,.nav-links a.active{color:var(--white)}
+/* LAYOUT */
+.wrapper{max-width:1200px;margin:0 auto;padding:2rem}
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:1rem;margin-bottom:2rem}
+.stat-card{background:var(--white);border:1px solid var(--sand);border-radius:10px;padding:1.1rem 1.25rem}
+.stat-label{font-size:11px;color:var(--slate);font-family:var(--mono);text-transform:uppercase;letter-spacing:1px;margin-bottom:.5rem}
+.stat-val{font-family:var(--serif);font-size:28px;letter-spacing:-.5px}
+.stat-sub{font-size:12px;color:var(--slate);margin-top:2px}
+/* TABS */
+.tabs{display:flex;gap:2px;border-bottom:2px solid var(--sand);margin-bottom:1.5rem}
+.tab-btn{padding:9px 20px;font-size:14px;font-weight:500;cursor:pointer;border:none;background:none;color:var(--slate);border-bottom:2px solid transparent;margin-bottom:-2px;font-family:var(--sans);transition:color var(--t)}
+.tab-btn.active{color:var(--black);border-bottom-color:var(--accent)}
+.tab-panel{display:none}.tab-panel.active{display:block}
+/* TABLE */
+.table-wrap{background:var(--white);border:1px solid var(--sand);border-radius:10px;overflow:hidden}
+.table-head{display:grid;padding:.75rem 1.25rem;background:var(--sand);font-size:11px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.5px;color:var(--slate);font-weight:500}
+.table-row{display:grid;padding:.9rem 1.25rem;border-bottom:1px solid var(--sand);align-items:center;font-size:13px;transition:background var(--t)}
+.table-row:last-child{border-bottom:none}
+.table-row:hover{background:#fafaf9}
+/* Products table: thumb | name | price | margin | status | actions */
+.prod-table .table-head,.prod-table .table-row{grid-template-columns:48px 1fr 80px 70px 90px 160px}
+/* Orders table: # | customer | total | payment | fulfillment | date | actions */
+.order-table .table-head,.order-table .table-row{grid-template-columns:110px 1fr 80px 80px 100px 90px 140px}
+.thumb-cell img{width:40px;height:40px;border-radius:6px;object-fit:cover;background:var(--sand)}
+.prod-name{font-weight:500;line-height:1.4}
+.prod-cat{font-size:11px;color:var(--slate);margin-top:2px}
+/* BADGES */
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:500;padding:3px 8px;border-radius:3px;font-family:var(--mono)}
+.badge-live{background:#d1fae5;color:#065f46}
+.badge-draft{background:#fef3cd;color:#92400e}
+.badge-paid{background:#dbeafe;color:#1e40af}
+.badge-pending-pay{background:#fee2e2;color:#991b1b}
+.badge-fulfill-pending{background:#fef9c3;color:#854d0e}
+.badge-fulfill-purchasing{background:#fde8d8;color:#9a3412}
+.badge-fulfill-purchased{background:#dbeafe;color:#1e40af}
+.badge-fulfill-shipped{background:#d1fae5;color:#065f46}
+.badge-fulfill-delivered{background:#f0fdf4;color:#166534}
+/* ACTION BTNS */
+.action-row{display:flex;gap:6px;flex-wrap:wrap}
+.act-btn{padding:5px 10px;font-size:12px;border-radius:4px;border:1px solid var(--sand);background:var(--white);cursor:pointer;font-family:var(--sans);transition:all var(--t);font-weight:500}
+.act-btn:hover{background:var(--sand)}
+.act-btn.green{border-color:#16a34a;color:#16a34a}
+.act-btn.green:hover{background:#d1fae5}
+.act-btn.red{border-color:var(--red);color:var(--red)}
+.act-btn.red:hover{background:#fee2e2}
+.act-btn.blue{border-color:#2563eb;color:#2563eb}
+.act-btn.blue:hover{background:#dbeafe}
+/* ORDER DETAIL MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:none;align-items:center;justify-content:center;padding:1rem}
+.modal-overlay.open{display:flex}
+.modal{background:var(--white);border-radius:14px;max-width:640px;width:100%;max-height:90vh;overflow-y:auto;padding:1.75rem}
+.modal-close{float:right;background:none;border:none;font-size:22px;cursor:pointer;color:var(--slate);line-height:1}
+.modal-title{font-family:var(--serif);font-size:22px;margin-bottom:1.25rem}
+.modal-section{margin-bottom:1.25rem}
+.modal-section-title{font-size:12px;font-family:var(--mono);text-transform:uppercase;letter-spacing:1px;color:var(--slate);margin-bottom:.6rem}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem .75rem}
+.info-row{font-size:13px}
+.info-label{color:var(--slate);font-size:11px}
+.ali-url-box{background:var(--sand);border-radius:6px;padding:.75rem 1rem;font-size:12px;font-family:var(--mono);word-break:break-all;margin-bottom:.5rem}
+/* FULFILLMENT */
+.fulfill-card{background:var(--white);border:1px solid var(--sand);border-radius:10px;padding:1.25rem;margin-bottom:1rem}
+.fulfill-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem}
+.fulfill-order-num{font-family:var(--mono);font-size:13px;font-weight:500}
+.address-box{background:var(--sand);border-radius:6px;padding:.75rem 1rem;font-size:13px;line-height:1.7;margin:.75rem 0;font-family:var(--mono)}
+.product-fulfill-row{display:flex;align-items:center;gap:10px;padding:.6rem 0;border-bottom:1px solid var(--sand)}
+.product-fulfill-row:last-child{border-bottom:none}
+.fulfill-thumb{width:44px;height:44px;border-radius:6px;object-fit:cover;background:var(--sand)}
+.tracking-input{padding:8px 10px;border:1.5px solid var(--sand);border-radius:4px;font-size:13px;font-family:var(--mono);width:200px;outline:none;transition:border-color var(--t)}
+.tracking-input:focus{border-color:var(--black)}
+/* MISC */
+.empty-state{text-align:center;padding:3rem;color:var(--slate);font-size:14px}
+.mono{font-family:var(--mono)}
+.toast{position:fixed;bottom:2rem;right:2rem;background:var(--black);color:var(--white);padding:12px 18px;border-radius:8px;font-size:14px;transform:translateY(100px);opacity:0;transition:all .3s ease;z-index:998;box-shadow:0 8px 32px rgba(0,0,0,.2)}
+.toast.show{transform:translateY(0);opacity:1}
+@media(max-width:900px){
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+  .prod-table .table-head,.prod-table .table-row{grid-template-columns:40px 1fr 70px 80px 120px}
+  .order-table .table-head,.order-table .table-row{grid-template-columns:100px 1fr 70px 90px 100px}
+}
+@media(max-width:600px){
+  .wrapper{padding:1rem}
+  .stats-grid{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- AUTH -->
+<div class="auth-overlay" id="auth-overlay">
+  <div class="auth-box">
+    <div class="auth-logo">Velo<span>.</span></div>
+    <p class="auth-sub">Admin dashboard — voer het wachtwoord in</p>
+    <input class="auth-input" id="auth-pw" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')checkAuth()"/>
+    <button class="auth-btn" onclick="checkAuth()">Inloggen</button>
+    <div class="auth-err" id="auth-err">Onjuist wachtwoord</div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Velo<span>.</span> <span style="font-family:var(--sans);font-size:12px;color:#6b7280;font-weight:400">admin</span></div>
+  <div class="nav-links">
+    <a href="/" target="_blank">🏪 Store</a>
+    <a href="/listing" target="_blank">📦 Listing</a>
+    <a href="/scorer" target="_blank">📊 Scorer</a>
+  </div>
+</nav>
+
+<div class="wrapper">
+
+  <!-- STATS -->
+  <div class="stats-grid" id="stats-grid">
+    <div class="stat-card"><div class="stat-label">Live producten</div><div class="stat-val" id="st-active">—</div></div>
+    <div class="stat-card"><div class="stat-label">Concept producten</div><div class="stat-val" id="st-pending">—</div></div>
+    <div class="stat-card"><div class="stat-label">Totaal bestellingen</div><div class="stat-val" id="st-orders">—</div></div>
+    <div class="stat-card"><div class="stat-label">Te verwerken</div><div class="stat-val" id="st-fulfill" style="color:var(--accent)">—</div></div>
+    <div class="stat-card"><div class="stat-label">Totale omzet</div><div class="stat-val mono" id="st-revenue">—</div></div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('products')">Producten</button>
+    <button class="tab-btn" onclick="switchTab('orders')">Bestellingen</button>
+    <button class="tab-btn" onclick="switchTab('fulfillment')">Verwerking</button>
+  </div>
+
+  <!-- PRODUCTS TAB -->
+  <div class="tab-panel active" id="tab-products">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+      <h2 style="font-family:var(--serif);font-size:22px">Producten</h2>
+      <a href="/listing" target="_blank" style="padding:9px 18px;background:var(--black);color:var(--white);border-radius:var(--r);font-size:13px;font-weight:500;text-decoration:none">+ Nieuw product</a>
+    </div>
+    <div class="table-wrap prod-table">
+      <div class="table-head"><div></div><div>Product</div><div>Prijs</div><div>Marge</div><div>Status</div><div>Acties</div></div>
+      <div id="products-list"><div class="empty-state">Producten laden...</div></div>
+    </div>
+  </div>
+
+  <!-- ORDERS TAB -->
+  <div class="tab-panel" id="tab-orders">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+      <h2 style="font-family:var(--serif);font-size:22px">Bestellingen</h2>
+      <button onclick="loadOrders()" style="padding:8px 14px;border:1px solid var(--sand);border-radius:var(--r);background:var(--white);font-size:13px;cursor:pointer">↻ Vernieuwen</button>
+    </div>
+    <div class="table-wrap order-table">
+      <div class="table-head"><div>Bestelnr.</div><div>Klant</div><div>Totaal</div><div>Betaling</div><div>Verwerking</div><div>Datum</div><div>Acties</div></div>
+      <div id="orders-list"><div class="empty-state">Bestellingen laden...</div></div>
+    </div>
+  </div>
+
+  <!-- FULFILLMENT TAB -->
+  <div class="tab-panel" id="tab-fulfillment">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+      <h2 style="font-family:var(--serif);font-size:22px">Te verwerken bestellingen</h2>
+      <button onclick="loadFulfillment()" style="padding:8px 14px;border:1px solid var(--sand);border-radius:var(--r);background:var(--white);font-size:13px;cursor:pointer">↻ Vernieuwen</button>
+    </div>
+    <div class="alert" style="background:#fef3cd;color:#92400e;padding:12px 16px;border-radius:8px;font-size:13px;margin-bottom:1.25rem;line-height:1.6">
+      <strong>Verwerkingsstroom:</strong> Open het product op AliExpress → voeg toe aan winkelwagen → vul het klantadres in → betaal → kom terug en klik "Verwerkt". Voeg daarna het trackingnummer in zodra je het hebt.
+    </div>
+    <div id="fulfillment-list"></div>
+  </div>
+</div>
+
+<!-- ORDER DETAIL MODAL -->
+<div class="modal-overlay" id="order-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <h2 class="modal-title" id="modal-order-num">Bestelling</h2>
+    <div id="modal-content"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const ADMIN_PW = 'velo2026'; // Change this in production!
+let allOrders = [];
+let allProducts = [];
+
+// ── Auth ──────────────────────────────────────────────
+function checkAuth() {
+  const pw = document.getElementById('auth-pw').value;
+  if (pw === ADMIN_PW) {
+    document.getElementById('auth-overlay').style.display = 'none';
+    init();
+  } else {
+    document.getElementById('auth-err').style.display = 'block';
+    document.getElementById('auth-pw').value = '';
+  }
+}
+document.getElementById('auth-pw').addEventListener('keydown', e => { if (e.key === 'Enter') checkAuth(); });
+
+// ── Toast ──────────────────────────────────────────────
+let toastTimer;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+// ── Tabs ───────────────────────────────────────────────
+function switchTab(name) {
+  document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.toggle('active', ['products','orders','fulfillment'][i] === name));
+  document.querySelectorAll('.tab-panel').forEach((p, i) => p.classList.toggle('active', ['products','orders','fulfillment'][i] === name));
+  if (name === 'products') loadProducts();
+  if (name === 'orders') loadOrders();
+  if (name === 'fulfillment') loadFulfillment();
+}
+
+// ── Formatters ─────────────────────────────────────────
+function euro(n) { return '€' + Number(n||0).toFixed(2).replace('.', ','); }
+function fmtDate(s) { if (!s) return '—'; const d = new Date(s); return d.toLocaleDateString('nl-NL', {day:'2-digit',month:'2-digit',year:'numeric'}); }
+
+function fulfillBadge(status) {
+  const map = {
+    pending: ['Te verwerken','badge-fulfill-pending'],
+    purchasing: ['Inkopen','badge-fulfill-purchasing'],
+    purchased: ['Ingekocht','badge-fulfill-purchased'],
+    shipped: ['Verzonden','badge-fulfill-shipped'],
+    delivered: ['Bezorgd','badge-fulfill-delivered'],
+  };
+  const [label, cls] = map[status] || ['Onbekend','badge-draft'];
+  return `<span class="badge ${cls}">${label}</span>`;
+}
+
+// ── Stats ──────────────────────────────────────────────
+async function loadStats() {
+  try {
+    const res = await fetch('/api/admin/stats');
+    const data = await res.json();
+    document.getElementById('st-active').textContent = data.active_products;
+    document.getElementById('st-pending').textContent = data.pending_products;
+    document.getElementById('st-orders').textContent = data.total_orders;
+    document.getElementById('st-fulfill').textContent = data.pending_fulfillment;
+    document.getElementById('st-revenue').textContent = euro(data.total_revenue);
+  } catch(e) { console.error(e); }
+}
+
+// ── Products ───────────────────────────────────────────
+async function loadProducts() {
+  try {
+    const res = await fetch('/api/admin/products');
+    allProducts = await res.json();
+    renderProducts();
+  } catch(e) { document.getElementById('products-list').innerHTML = '<div class="empty-state">Kon producten niet laden.</div>'; }
+}
+
+function renderProducts() {
+  const el = document.getElementById('products-list');
+  if (!allProducts.length) { el.innerHTML = '<div class="empty-state">Geen producten. <a href="/listing" style="color:var(--accent)">Voeg een product toe →</a></div>'; return; }
+  el.innerHTML = allProducts.map(p => {
+    const img = (p.images||[])[0] || '';
+    const margin = p.supplier_cost && p.price ? Math.round((p.price - p.supplier_cost - p.price*0.025 - 6) / p.price * 100) : null;
+    const marginColor = margin >= 40 ? '#16a34a' : margin >= 20 ? '#d97706' : '#dc2626';
+    return `<div class="table-row">
+      <div class="thumb-cell">${img ? `<img src="${img}" alt="" onerror="this.style.display='none'"/>` : '<div style="width:40px;height:40px;background:var(--sand);border-radius:6px"></div>'}</div>
+      <div>
+        <div class="prod-name">${p.title_nl}</div>
+        <div class="prod-cat">${p.category} ${p.aliexpress_id ? '· AE: '+p.aliexpress_id : ''}</div>
+      </div>
+      <div class="mono">${euro(p.price)}</div>
+      <div class="mono" style="color:${marginColor}">${margin !== null ? margin+'%' : '—'}</div>
+      <div>${p.is_active ? '<span class="badge badge-live">Live</span>' : '<span class="badge badge-draft">Concept</span>'}</div>
+      <div class="action-row">
+        ${p.is_active
+          ? `<button class="act-btn red" onclick="toggleProduct(${p.id},false)">Offline</button>`
+          : `<button class="act-btn green" onclick="toggleProduct(${p.id},true)">Live</button>`}
+        ${p.aliexpress_url ? `<button class="act-btn blue" onclick="window.open('${p.aliexpress_url}','_blank')">AliExpress</button>` : ''}
+        <button class="act-btn red" onclick="deleteProduct(${p.id},'${p.title_nl.replace(/'/g,'')}')">Verwijder</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function toggleProduct(id, active) {
+  const endpoint = active ? 'activate' : 'deactivate';
+  await fetch(`/api/products/${id}/${endpoint}`, { method: 'POST' });
+  toast(active ? '✓ Product nu live' : '✓ Product offline gehaald');
+  await loadProducts(); await loadStats();
+}
+
+async function deleteProduct(id, name) {
+  if (!confirm(`"${name}" verwijderen? Dit kan niet ongedaan worden gemaakt.`)) return;
+  await fetch(`/api/products/${id}`, { method: 'DELETE' });
+  toast('✓ Product verwijderd');
+  await loadProducts(); await loadStats();
+}
+
+// ── Orders ─────────────────────────────────────────────
+async function loadOrders() {
+  try {
+    const res = await fetch('/api/admin/orders');
+    allOrders = await res.json();
+    renderOrders();
+  } catch(e) { document.getElementById('orders-list').innerHTML = '<div class="empty-state">Kon bestellingen niet laden.</div>'; }
+}
+
+function renderOrders() {
+  const el = document.getElementById('orders-list');
+  if (!allOrders.length) { el.innerHTML = '<div class="empty-state">Geen bestellingen ontvangen.</div>'; return; }
+  el.innerHTML = allOrders.map(o => `
+    <div class="table-row">
+      <div class="mono" style="font-size:12px">${o.order_number}</div>
+      <div>
+        <div style="font-weight:500">${o.customer_name}</div>
+        <div style="font-size:11px;color:var(--slate)">${o.customer_email}</div>
+      </div>
+      <div class="mono">${euro(o.total)}</div>
+      <div><span class="badge ${o.payment_status==='paid'?'badge-paid':'badge-pending-pay'}">${o.payment_status==='paid'?'Betaald':'In afwachting'}</span></div>
+      <div>${fulfillBadge(o.fulfillment_status)}</div>
+      <div style="font-size:12px;color:var(--slate)">${fmtDate(o.created_at)}</div>
+      <div class="action-row">
+        <button class="act-btn blue" onclick="openOrderModal(${o.id})">Details</button>
+      </div>
+    </div>`).join('');
+}
+
+function openOrderModal(id) {
+  const o = allOrders.find(x => x.id === id);
+  if (!o) return;
+  document.getElementById('modal-order-num').textContent = 'Bestelling ' + o.order_number;
+  const addr = o.shipping_address || {};
+  const items = (o.items || []);
+  document.getElementById('modal-content').innerHTML = `
+    <div class="modal-section">
+      <div class="modal-section-title">Klantgegevens</div>
+      <div class="info-grid">
+        <div><div class="info-label">Naam</div><div class="info-row">${o.customer_name}</div></div>
+        <div><div class="info-label">E-mail</div><div class="info-row">${o.customer_email}</div></div>
+        <div><div class="info-label">Telefoon</div><div class="info-row">${o.customer_phone||'—'}</div></div>
+        <div><div class="info-label">Betaalmethode</div><div class="info-row">${o.payment_method||'—'}</div></div>
+      </div>
+    </div>
+    <div class="modal-section">
+      <div class="modal-section-title">Bezorgadres</div>
+      <div class="address-box">${addr.street||''}<br/>${addr.zip_code||''} ${addr.city||''}<br/>${addr.country||''}</div>
+    </div>
+    <div class="modal-section">
+      <div class="modal-section-title">Bestelde producten</div>
+      ${items.map(item => `
+        <div class="product-fulfill-row">
+          ${item.image ? `<img class="fulfill-thumb" src="${item.image}" alt="" onerror="this.style.display='none'"/>` : '<div class="fulfill-thumb"></div>'}
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:500">${item.name}</div>
+            <div style="font-size:12px;color:var(--slate)">Aantal: ${item.qty} · ${euro(item.price)} per stuk</div>
+          </div>
+          <span class="mono" style="font-size:13px">${euro(item.price * item.qty)}</span>
+        </div>`).join('')}
+      <div style="display:flex;justify-content:space-between;padding:.75rem 0;font-weight:600;font-size:14px;border-top:2px solid var(--sand);margin-top:.25rem">
+        <span>Totaal</span><span class="mono">${euro(o.total)}</span>
+      </div>
+    </div>
+    <div class="modal-section">
+      <div class="modal-section-title">Verwerkingsstatus</div>
+      <div style="margin-bottom:1rem">${fulfillBadge(o.fulfillment_status)}</div>
+      ${o.tracking_number ? `<div style="font-size:13px;margin-bottom:.5rem">📦 Tracking: <span class="mono">${o.tracking_number}</span></div>` : ''}
+      ${o.aliexpress_order_ref ? `<div style="font-size:13px">AliExpress ref: <span class="mono">${o.aliexpress_order_ref}</span></div>` : ''}
+    </div>`;
+  document.getElementById('order-modal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('order-modal').classList.remove('open');
+}
+
+// ── Fulfillment ────────────────────────────────────────
+async function loadFulfillment() {
+  try {
+    const res = await fetch('/api/admin/orders');
+    allOrders = await res.json();
+    renderFulfillment();
+  } catch(e) { document.getElementById('fulfillment-list').innerHTML = '<div class="empty-state">Kon bestellingen niet laden.</div>'; }
+}
+
+function renderFulfillment() {
+  const pending = allOrders.filter(o => !['delivered'].includes(o.fulfillment_status));
+  const el = document.getElementById('fulfillment-list');
+  if (!pending.length) {
+    el.innerHTML = '<div style="text-align:center;padding:3rem;color:var(--slate);font-size:14px">✅ Geen openstaande bestellingen. Alles is verwerkt!</div>';
+    return;
+  }
+  el.innerHTML = pending.map(o => {
+    const addr = o.shipping_address || {};
+    const items = o.items || [];
+    const canProgress = o.fulfillment_status !== 'delivered';
+    const nextStatus = {pending:'purchasing',purchasing:'purchased',purchased:'shipped',shipped:'delivered'}[o.fulfillment_status];
+    const nextLabel = {pending:'Inkopen gestart',purchasing:'Ingekocht op AliExpress',purchased:'Verzonden naar klant',shipped:'Bezorgd bij klant'}[o.fulfillment_status];
+
+    return `<div class="fulfill-card">
+      <div class="fulfill-card-header">
+        <div>
+          <div class="fulfill-order-num">${o.order_number}</div>
+          <div style="font-size:12px;color:var(--slate);margin-top:2px">${o.customer_name} · ${fmtDate(o.created_at)}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          ${fulfillBadge(o.fulfillment_status)}
+          <span class="mono" style="font-size:14px;font-weight:500">${euro(o.total)}</span>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+        <div>
+          <div style="font-size:11px;font-family:var(--mono);text-transform:uppercase;letter-spacing:1px;color:var(--slate);margin-bottom:.4rem">Bezorgadres</div>
+          <div class="address-box">${o.customer_name}<br/>${addr.street||''}<br/>${addr.zip_code||''} ${addr.city||''}<br/>${addr.country||''}</div>
+        </div>
+        <div>
+          <div style="font-size:11px;font-family:var(--mono);text-transform:uppercase;letter-spacing:1px;color:var(--slate);margin-bottom:.4rem">Producten om in te kopen</div>
+          ${items.map(item => `
+            <div class="product-fulfill-row">
+              ${item.image ? `<img class="fulfill-thumb" src="${item.image}" alt="" onerror="this.style.display='none'"/>` : '<div class="fulfill-thumb"></div>'}
+              <div style="flex:1">
+                <div style="font-size:12px;font-weight:500">${item.name}</div>
+                <div style="font-size:11px;color:var(--slate)">×${item.qty}</div>
+              </div>
+              ${item.aliexpress_url
+                ? `<button onclick="window.open('${item.aliexpress_url}','_blank')" style="padding:5px 10px;font-size:11px;background:var(--black);color:var(--white);border:none;border-radius:4px;cursor:pointer;white-space:nowrap">Open AliExpress ↗</button>`
+                : '<span style="font-size:11px;color:var(--slate)">Geen URL</span>'}
+            </div>`).join('')}
+        </div>
+      </div>
+
+      <div style="border-top:1px solid var(--sand);padding-top:1rem;margin-top:1rem;display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap">
+        <div style="flex:1;min-width:240px">
+          <div style="font-size:12px;color:var(--slate);margin-bottom:5px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.5px">Trackingnummer</div>
+          <div style="display:flex;gap:8px">
+            <input class="tracking-input" id="track-${o.id}" placeholder="bijv. NL1234567890" value="${o.tracking_number||''}"/>
+            <button onclick="saveTracking(${o.id})" style="padding:8px 14px;font-size:12px;background:var(--black);color:var(--white);border:none;border-radius:4px;cursor:pointer;font-weight:500">Opslaan</button>
+          </div>
+        </div>
+        ${canProgress ? `<div>
+          <div style="font-size:12px;color:var(--slate);margin-bottom:5px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.5px">Status bijwerken</div>
+          <button onclick="updateFulfillment(${o.id},'${nextStatus}')" style="padding:8px 16px;font-size:13px;font-weight:500;background:var(--accent);color:var(--white);border:none;border-radius:4px;cursor:pointer;">
+            ✓ ${nextLabel}
+          </button>
+        </div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function updateFulfillment(orderId, status) {
+  const trackEl = document.getElementById('track-' + orderId);
+  const tracking = trackEl ? trackEl.value.trim() : null;
+  await fetch(`/api/admin/orders/${orderId}/fulfillment`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ status, tracking_number: tracking || null }),
+  });
+  toast('✓ Status bijgewerkt naar: ' + status);
+  await loadFulfillment(); await loadStats();
+}
+
+async function saveTracking(orderId) {
+  const tracking = document.getElementById('track-' + orderId)?.value.trim();
+  if (!tracking) { toast('Voer een trackingnummer in'); return; }
+  await fetch(`/api/admin/orders/${orderId}/fulfillment`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ status: 'shipped', tracking_number: tracking }),
+  });
+  toast('✓ Trackingnummer opgeslagen');
+  await loadFulfillment(); await loadStats();
+}
+
+// ── Init ───────────────────────────────────────────────
+async function init() {
+  await loadStats();
+  await loadProducts();
+}
+
+// Close modal on overlay click
+document.getElementById('order-modal').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeModal();
+});
+</script>
+</body>
+</html>

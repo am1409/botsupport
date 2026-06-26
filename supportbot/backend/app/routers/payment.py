@@ -19,7 +19,7 @@ from fastapi.responses import JSONResponse, RedirectResponse, HTMLResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from app.database import get_db
-from app.models.shop import ShopOrder
+from app.models import ShopOrder
 
 router = APIRouter()
 

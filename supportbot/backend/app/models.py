@@ -1,10 +1,11 @@
 import uuid
 from datetime import datetime, timezone, timedelta
-from sqlalchemy import Column, String, Boolean, DateTime, Integer, Text, ForeignKey, Enum
+from sqlalchemy import Column, String, Boolean, DateTime, Integer, Text, ForeignKey, Enum, Float
 from sqlalchemy.orm import relationship
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.dialects.postgresql import UUID, JSON
 from pgvector.sqlalchemy import Vector
 from app.database import Base
+from sqlalchemy.sql import func
 import enum
 
 class PlanType(str, enum.Enum):

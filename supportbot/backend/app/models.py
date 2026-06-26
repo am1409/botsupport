@@ -82,3 +82,48 @@ class ChatMessage(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
     session = relationship("ChatSession", back_populates="messages")
+
+# ── Dropshipping models ───────────────────────────────────────────
+
+class ShopProduct(Base):
+    __tablename__ = "shop_products"
+
+    id = Column(Integer, primary_key=True, index=True)
+    aliexpress_url = Column(String, nullable=True)
+    aliexpress_id = Column(String, nullable=True)
+    title_nl = Column(String, nullable=False)
+    description_nl = Column(Text, nullable=True)
+    features = Column(JSON, default=list)
+    price = Column(Float, nullable=False)
+    original_price = Column(Float, nullable=True)
+    supplier_cost = Column(Float, nullable=True)
+    images = Column(JSON, default=list)
+    category = Column(String, default="accessories")
+    rating = Column(Float, nullable=True)
+    orders_count = Column(Integer, default=0)
+    ship_days = Column(String, default="3–7 werkdagen")
+    badge = Column(String, nullable=True)
+    badge_class = Column(String, nullable=True)
+    is_active = Column(Boolean, default=False)
+    created_at = Column(DateTime, server_default=func.now())
+
+
+class ShopOrder(Base):
+    __tablename__ = "shop_orders"
+
+    id = Column(Integer, primary_key=True, index=True)
+    order_number = Column(String, unique=True, nullable=False)
+    customer_name = Column(String, nullable=False)
+    customer_email = Column(String, nullable=False)
+    customer_phone = Column(String, nullable=True)
+    shipping_address = Column(JSON, nullable=False)
+    items = Column(JSON, nullable=False)
+    subtotal = Column(Float, nullable=False)
+    total = Column(Float, nullable=False)
+    payment_method = Column(String, nullable=True)
+    payment_status = Column(String, default="pending")
+    fulfillment_status = Column(String, default="pending")
+    aliexpress_order_ref = Column(String, nullable=True)
+    tracking_number = Column(String, nullable=True)
+    notes = Column(String, nullable=True)
+    created_at = Column(DateTime, server_default=func.now())

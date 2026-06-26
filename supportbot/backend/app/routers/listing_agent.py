@@ -7,7 +7,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from app.database import get_db
-from app.models.shop import ShopProduct
+from app.models import ShopProduct
 from pydantic import BaseModel
 from typing import Optional
 import httpx

@@ -31,6 +31,12 @@ async def scorer():
 async def startup():
     await init_db()
 
+@app.get("/", response_class=HTMLResponse)
+async def storefront():
+    path = os.path.join(os.path.dirname(__file__), "index.html")
+    with open(path) as f:
+        return f.read()
+
 app.include_router(auth.router,    prefix="/auth",    tags=["Auth"])
 app.include_router(clients.router, prefix="/clients", tags=["Clients"])
 app.include_router(ingest.router,  prefix="/ingest",  tags=["Ingestion"])

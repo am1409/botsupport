@@ -6,7 +6,6 @@ from app.routers import chat, clients, ingest, auth, billing, aliexpress
 from app.database import init_db
 from fastapi.responses import HTMLResponse
 from app.routers import products, orders, listing_agent, payment
-from app.models.shop import ShopProduct, ShopOrder
 import os
 
 app = FastAPI(

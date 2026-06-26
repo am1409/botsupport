@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Velo — Listing Agent</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --black:#0D0D0D;--white:#fff;--bg:#F7F5F0;--sand:#E8E0D0;
+  --accent:#C9410A;--slate:#6B7280;--green:#16a34a;
+  --serif:'DM Serif Display',serif;--sans:'Inter',sans-serif;--mono:'DM Mono',monospace;
+  --r:8px;--t:.2s ease;
+}
+body{font-family:var(--sans);background:var(--bg);color:var(--black);min-height:100vh;-webkit-font-smoothing:antialiased}
+/* NAV */
+nav{background:var(--black);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:60px}
+.nav-logo{font-family:var(--serif);font-size:20px;color:var(--white)}
+.nav-logo span{color:var(--accent)}
+.nav-links{display:flex;gap:1.5rem}
+.nav-links a{font-size:13px;color:#9ca3af;text-decoration:none;transition:color var(--t)}
+.nav-links a:hover,.nav-links a.active{color:var(--white)}
+/* LAYOUT */
+.main{max-width:860px;margin:0 auto;padding:2.5rem 2rem}
+h1{font-family:var(--serif);font-size:32px;margin-bottom:.4rem}
+.subtitle{font-size:14px;color:var(--slate);margin-bottom:2.5rem}
+/* CARDS */
+.card{background:var(--white);border:1px solid var(--sand);border-radius:12px;padding:1.5rem;margin-bottom:1.5rem}
+.card-title{font-size:13px;font-weight:600;margin-bottom:1.25rem;color:var(--slate);text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono)}
+/* FORM */
+.field{margin-bottom:1rem}
+.field label{display:block;font-size:12px;color:var(--slate);font-weight:500;margin-bottom:5px}
+.field input,.field textarea,.field select{width:100%;padding:10px 13px;border:1.5px solid var(--sand);border-radius:var(--r);font-size:14px;font-family:var(--sans);background:var(--bg);outline:none;transition:border-color var(--t);resize:vertical}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--black)}
+.field textarea{min-height:100px;line-height:1.6}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+/* BTNS */
+.btn{cursor:pointer;padding:10px 22px;border-radius:var(--r);font-size:14px;font-weight:500;border:1.5px solid var(--sand);background:var(--white);color:var(--black);font-family:var(--sans);transition:all var(--t)}
+.btn:hover{background:var(--sand)}
+.btn-black{background:var(--black);color:var(--white);border-color:var(--black)}
+.btn-black:hover{background:#333}
+.btn-accent{background:var(--accent);color:var(--white);border-color:var(--accent)}
+.btn-accent:hover{background:#a83508}
+.btn-lg{padding:13px 28px;font-size:15px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+/* PROCESS BTN */
+.process-btn{width:100%;padding:15px;font-size:15px;font-weight:600;background:var(--black);color:var(--white);border:none;border-radius:var(--r);cursor:pointer;transition:background var(--t);margin-top:.5rem}
+.process-btn:hover{background:#333}
+.process-btn:disabled{opacity:.5;cursor:not-allowed}
+/* LOADING */
+.loading-wrap{text-align:center;padding:3rem 0;display:none}
+.spinner{width:40px;height:40px;border:3px solid var(--sand);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 1rem}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-steps{display:flex;flex-direction:column;gap:8px;max-width:280px;margin:1.5rem auto 0;text-align:left}
+.loading-step{font-size:13px;color:var(--slate);padding:6px 0;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--sand)}
+.loading-step.done{color:var(--green)}
+.loading-step.active{color:var(--black);font-weight:500}
+.step-icon{font-size:14px;width:20px;text-align:center}
+/* PREVIEW */
+.preview-wrap{display:none}
+.img-gallery{display:grid;grid-template-columns:1fr;gap:8px;margin-bottom:1.25rem}
+.main-img-wrap{aspect-ratio:4/3;background:var(--sand);border-radius:10px;overflow:hidden;margin-bottom:8px}
+.main-img-wrap img{width:100%;height:100%;object-fit:cover}
+.thumb-strip{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px}
+.thumb{width:64px;height:64px;border-radius:6px;overflow:hidden;border:2px solid transparent;cursor:pointer;background:var(--sand);flex-shrink:0;transition:border-color var(--t)}
+.thumb.active{border-color:var(--black)}
+.thumb img{width:100%;height:100%;object-fit:cover}
+/* MARGIN */
+.margin-box{background:var(--sand);border-radius:8px;padding:1rem 1.25rem;display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.25rem}
+.margin-item .m-label{font-family:var(--mono);font-size:10px;color:var(--slate);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px}
+.margin-item .m-val{font-family:var(--mono);font-size:20px;font-weight:500}
+/* FEATURES */
+.features-list{list-style:none;margin-bottom:.5rem}
+.features-list li{display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:1px solid var(--sand);font-size:13px}
+.features-list li::before{content:"✓";color:var(--accent);font-weight:700;margin-top:1px;flex-shrink:0}
+.feat-edit{display:flex;flex-direction:column;gap:6px}
+.feat-edit input{padding:7px 10px;border:1.5px solid var(--sand);border-radius:6px;font-size:13px;font-family:var(--sans);background:var(--bg);outline:none;transition:border-color var(--t)}
+.feat-edit input:focus{border-color:var(--black)}
+/* STATUS BADGES */
+.badge{display:inline-block;font-family:var(--mono);font-size:11px;padding:3px 8px;border-radius:3px;font-weight:500}
+.badge-pending{background:#fef3cd;color:#856404}
+.badge-live{background:#d1fae5;color:#065f46}
+/* ALERTS */
+.alert{padding:12px 16px;border-radius:8px;font-size:13px;margin-bottom:1rem;line-height:1.6}
+.alert-err{background:#fee2e2;color:#991b1b}
+.alert-ok{background:#d1fae5;color:#065f46}
+.alert-info{background:#dbeafe;color:#1e40af}
+/* PUBLISH ACTIONS */
+.publish-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:1.5rem}
+/* TOAST */
+.toast{position:fixed;bottom:2rem;right:2rem;background:var(--black);color:var(--white);padding:12px 18px;border-radius:8px;font-size:14px;transform:translateY(100px);opacity:0;transition:all .3s ease;z-index:999;box-shadow:0 8px 32px rgba(0,0,0,.2)}
+.toast.show{transform:translateY(0);opacity:1}
+@media(max-width:600px){
+  .main{padding:1.5rem 1rem}
+  .field-row{grid-template-columns:1fr}
+  .margin-box{grid-template-columns:1fr 1fr}
+  .publish-row{flex-direction:column}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">Velo<span>.</span></div>
+  <div class="nav-links">
+    <a href="/">🏪 Store</a>
+    <a href="/listing" class="active">📦 Listing Agent</a>
+    <a href="/admin">⚙️ Admin</a>
+    <a href="/scorer">📊 Scorer</a>
+  </div>
+</nav>
+
+<div class="main">
+  <h1>Listing Agent</h1>
+  <p class="subtitle">Plak een AliExpress URL — de AI herschrijft het product in het Nederlands en zet het klaar voor je store.</p>
+
+  <!-- STEP 1: Input -->
+  <div id="step-input">
+    <div class="card">
+      <div class="card-title">Stap 1 — Product selecteren</div>
+      <div class="field">
+        <label>AliExpress product URL</label>
+        <input id="ali-url" type="url" placeholder="https://www.aliexpress.com/item/1234567890.html" onkeydown="if(event.key==='Enter')processListing()"/>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Jouw verkoopprijs (€)</label>
+          <input id="sell-price" type="number" min="0" step="0.5" placeholder="bijv. 29.95"/>
+        </div>
+        <div class="field">
+          <label>Streepjesprijs (€) — optioneel</label>
+          <input id="orig-price" type="number" min="0" step="0.5" placeholder="bijv. 59.95"/>
+        </div>
+      </div>
+      <div id="input-error" class="alert alert-err" style="display:none"></div>
+      <button class="process-btn" id="process-btn" onclick="processListing()">
+        🤖 Verwerken met AI
+      </button>
+    </div>
+
+    <div class="alert alert-info">
+      <strong>Hoe werkt het?</strong><br/>
+      Kopieer de URL van een AliExpress product (bijv. via de scorer tool), vul je verkoopprijs in, en klik op verwerken.
+      De AI haalt alle productinformatie op, herschrijft de titel en beschrijving in professioneel Nederlands, en zet het product klaar.
+      Jij controleert, past eventueel aan, en klikt op publiceren.
+    </div>
+  </div>
+
+  <!-- LOADING -->
+  <div class="loading-wrap" id="loading-wrap">
+    <div class="spinner"></div>
+    <p style="font-size:15px;font-weight:500;margin-bottom:.25rem">AI is bezig...</p>
+    <p style="font-size:13px;color:var(--slate)">Dit duurt meestal 10–20 seconden</p>
+    <div class="loading-steps">
+      <div class="loading-step" id="ls-1"><span class="step-icon">⏳</span>AliExpress product ophalen</div>
+      <div class="loading-step" id="ls-2"><span class="step-icon">⏳</span>Afbeeldingen verwerken</div>
+      <div class="loading-step" id="ls-3"><span class="step-icon">⏳</span>Tekst herschrijven in het Nederlands</div>
+      <div class="loading-step" id="ls-4"><span class="step-icon">⏳</span>Marge berekenen</div>
+    </div>
+  </div>
+
+  <!-- STEP 2: Preview & edit -->
+  <div class="preview-wrap" id="preview-wrap">
+    <div class="alert alert-ok" id="preview-alert">
+      ✅ Product verwerkt! Controleer de informatie en pas aan waar nodig. Klik daarna op publiceren.
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem">
+
+      <!-- Left: Images -->
+      <div>
+        <div class="card">
+          <div class="card-title">Afbeeldingen</div>
+          <div class="main-img-wrap">
+            <img id="prev-main-img" src="" alt=""/>
+          </div>
+          <div class="thumb-strip" id="prev-thumbs"></div>
+          <p style="font-size:11px;color:var(--slate);margin-top:.75rem">
+            <span id="img-count">0</span> afbeeldingen gevonden van AliExpress.
+          </p>
+        </div>
+      </div>
+
+      <!-- Right: Info -->
+      <div>
+        <div class="card">
+          <div class="card-title">Prijsinformatie</div>
+          <div class="margin-box">
+            <div class="margin-item">
+              <div class="m-label">Inkoopprijs</div>
+              <div class="m-val" id="m-supplier">€—</div>
+            </div>
+            <div class="margin-item">
+              <div class="m-label">Verkoopprijs</div>
+              <div class="m-val" id="m-sell">€—</div>
+            </div>
+            <div class="margin-item">
+              <div class="m-label">Nettomarge</div>
+              <div class="m-val" id="m-margin" style="color:var(--green)">—%</div>
+            </div>
+          </div>
+          <div style="font-size:12px;color:var(--slate)">Marge na inkoopprijs, platformkosten (2.5%) en geschatte advertentiekosten (€6)</div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">AliExpress data</div>
+          <div style="display:flex;gap:1.5rem;font-size:13px">
+            <div><span style="color:var(--slate)">Beoordeling: </span><strong id="ali-rating">—</strong></div>
+            <div><span style="color:var(--slate)">Bestellingen: </span><strong id="ali-orders">—</strong></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Editable content -->
+    <div class="card">
+      <div class="card-title">Producttitel (bewerkbaar)</div>
+      <div class="field">
+        <input id="edit-title" type="text" placeholder="Nederlandse producttitel"/>
+        <span style="font-size:11px;color:var(--slate);margin-top:4px;display:block" id="title-chars">0 / 70</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Beschrijving (bewerkbaar)</div>
+      <div class="field">
+        <textarea id="edit-desc" rows="6" placeholder="Nederlandse productomschrijving..."></textarea>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Productkenmerken (bewerkbaar)</div>
+      <div class="feat-edit" id="feat-edit"></div>
+      <button onclick="addFeature()" class="btn" style="margin-top:.75rem;font-size:13px">+ Kenmerk toevoegen</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Categorisering & badge</div>
+      <div class="field-row">
+        <div class="field">
+          <label>Categorie</label>
+          <select id="edit-cat">
+            <option value="gadgets">Gadgets</option>
+            <option value="home">Huis & Tuin</option>
+            <option value="fitness">Fitness</option>
+            <option value="accessories">Accessoires</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Badge (optioneel)</label>
+          <input id="edit-badge" placeholder="bijv. NIEUW of -50%"/>
+        </div>
+      </div>
+      <div class="field">
+        <label>Levertijd</label>
+        <select id="edit-ship">
+          <option>2–4 werkdagen</option>
+          <option selected>3–7 werkdagen</option>
+          <option>5–10 werkdagen</option>
+          <option>7–14 werkdagen</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Publish actions -->
+    <div id="publish-error" class="alert alert-err" style="display:none"></div>
+    <div class="publish-row">
+      <button class="btn btn-accent btn-lg" onclick="publish(true)">
+        ✅ Publiceren — direct live
+      </button>
+      <button class="btn btn-black btn-lg" onclick="publish(false)">
+        🔍 Opslaan — eerst controleren in admin
+      </button>
+      <button class="btn btn-lg" onclick="resetForm()">
+        ↩ Nieuw product
+      </button>
+    </div>
+    <p style="font-size:12px;color:var(--slate);margin-top:.75rem">"Direct live" zet het product meteen zichtbaar in de store. "Eerst controleren" slaat het op als concept.</p>
+  </div>
+
+  <!-- SUCCESS -->
+  <div id="success-wrap" style="display:none;text-align:center;padding:3rem 0">
+    <div style="font-size:48px;margin-bottom:1rem">🎉</div>
+    <h2 style="font-family:var(--serif);font-size:28px;margin-bottom:.5rem">Product gepubliceerd!</h2>
+    <p style="color:var(--slate);font-size:14px;margin-bottom:1.5rem" id="success-msg"></p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+      <button class="btn btn-black" onclick="resetForm()">Nog een product toevoegen</button>
+      <button class="btn" onclick="window.open('/','_blank')">Store bekijken</button>
+      <button class="btn" onclick="window.open('/admin','_blank')">Naar admin</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let currentData = null;
+let allImages = [];
+let currentImgIndex = 0;
+
+// ── Toast ──────────────────────────────────────────────
+let toastTimer;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+// ── Loading step animation ─────────────────────────────
+function setStep(n, state) {
+  const el = document.getElementById('ls-' + n);
+  if (!el) return;
+  el.className = 'loading-step ' + state;
+  el.querySelector('.step-icon').textContent = state === 'done' ? '✓' : state === 'active' ? '→' : '⏳';
+}
+
+// ── Process ────────────────────────────────────────────
+async function processListing() {
+  const url = document.getElementById('ali-url').value.trim();
+  const price = parseFloat(document.getElementById('sell-price').value);
+
+  document.getElementById('input-error').style.display = 'none';
+
+  if (!url) { showErr('Vul een AliExpress URL in.'); return; }
+  if (!url.includes('aliexpress')) { showErr('Dit lijkt geen AliExpress URL. Kopieer de URL van een AliExpress productpagina.'); return; }
+  if (!price || price <= 0) { showErr('Vul een geldige verkoopprijs in.'); return; }
+
+  // Show loading
+  document.getElementById('step-input').style.display = 'none';
+  document.getElementById('loading-wrap').style.display = 'block';
+  document.getElementById('preview-wrap').style.display = 'none';
+  document.getElementById('success-wrap').style.display = 'none';
+
+  // Animate steps
+  setStep(1, 'active');
+  await sleep(400);
+
+  try {
+    const res = await fetch('/api/listing/process', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        aliexpress_url: url,
+        selling_price: price,
+        original_price: parseFloat(document.getElementById('orig-price').value) || null,
+      }),
+    });
+
+    setStep(1, 'done'); setStep(2, 'active'); await sleep(300);
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.detail || 'Onbekende fout');
+    }
+
+    const data = await res.json();
+    currentData = data;
+
+    setStep(2, 'done'); setStep(3, 'active'); await sleep(400);
+    setStep(3, 'done'); setStep(4, 'active'); await sleep(200);
+    setStep(4, 'done');
+
+    await sleep(400);
+    renderPreview(data);
+
+  } catch (e) {
+    document.getElementById('loading-wrap').style.display = 'none';
+    document.getElementById('step-input').style.display = 'block';
+    showErr('Fout: ' + e.message);
+  }
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+function showErr(msg) {
+  const el = document.getElementById('input-error');
+  el.textContent = msg; el.style.display = 'block';
+}
+
+// ── Render preview ─────────────────────────────────────
+function renderPreview(data) {
+  document.getElementById('loading-wrap').style.display = 'none';
+  document.getElementById('preview-wrap').style.display = 'block';
+
+  const r = data.rewritten || {};
+  allImages = data.images || [];
+  currentImgIndex = 0;
+
+  // Images
+  if (allImages.length) {
+    document.getElementById('prev-main-img').src = allImages[0];
+    document.getElementById('img-count').textContent = allImages.length;
+    document.getElementById('prev-thumbs').innerHTML = allImages.map((img, i) =>
+      `<div class="thumb ${i===0?'active':''}" onclick="setPreviewImg(${i})">
+        <img src="${img}" alt="" onerror="this.style.display='none'"/>
+      </div>`).join('');
+  }
+
+  // Margin
+  const cost = data.supplier_cost || 0;
+  const sell = data.selling_price || 0;
+  const margin = data.margin_pct || 0;
+  document.getElementById('m-supplier').textContent = cost ? '€' + cost.toFixed(2) : 'Onbekend*';
+  document.getElementById('m-sell').textContent = '€' + sell.toFixed(2);
+  const mEl = document.getElementById('m-margin');
+  mEl.textContent = margin + '%';
+  mEl.style.color = margin >= 40 ? '#16a34a' : margin >= 20 ? '#d97706' : '#dc2626';
+
+  // AliExpress data
+  document.getElementById('ali-rating').textContent = data.rating ? data.rating + ' ★' : 'N/B';
+  document.getElementById('ali-orders').textContent = data.orders_count ? data.orders_count.toLocaleString('nl') : '0';
+
+  // Editable fields
+  const titleEl = document.getElementById('edit-title');
+  titleEl.value = r.title_nl || data.raw_title || '';
+  updateTitleChars();
+  titleEl.addEventListener('input', updateTitleChars);
+
+  document.getElementById('edit-desc').value = r.description_nl || '';
+
+  // Features
+  renderFeatures(r.features || []);
+
+  // Category & badge
+  document.getElementById('edit-cat').value = r.category || 'accessories';
+  document.getElementById('edit-badge').value = r.badge || '';
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function setPreviewImg(idx) {
+  currentImgIndex = idx;
+  document.getElementById('prev-main-img').src = allImages[idx];
+  document.querySelectorAll('#prev-thumbs .thumb').forEach((t, i) => {
+    t.classList.toggle('active', i === idx);
+  });
+}
+
+function updateTitleChars() {
+  const val = document.getElementById('edit-title').value.length;
+  const el = document.getElementById('title-chars');
+  el.textContent = val + ' / 70';
+  el.style.color = val > 70 ? '#dc2626' : val > 55 ? '#d97706' : '#6b7280';
+}
+
+function renderFeatures(feats) {
+  const container = document.getElementById('feat-edit');
+  container.innerHTML = feats.map((f, i) =>
+    `<div style="display:flex;gap:6px;align-items:center">
+      <input value="${f.replace(/"/g,'&quot;')}" onchange="updateFeature(${i},this.value)" style="flex:1"/>
+      <button onclick="removeFeature(${i})" style="background:none;border:1px solid var(--sand);border-radius:4px;padding:5px 8px;cursor:pointer;font-size:14px;color:var(--slate)">×</button>
+    </div>`).join('');
+}
+
+function getFeatures() {
+  return Array.from(document.querySelectorAll('#feat-edit input')).map(el => el.value.trim()).filter(Boolean);
+}
+
+function updateFeature(i, val) { /* live — read on publish */ }
+
+function removeFeature(i) {
+  const feats = getFeatures();
+  feats.splice(i, 1);
+  renderFeatures(feats);
+}
+
+function addFeature() {
+  const feats = getFeatures();
+  feats.push('');
+  renderFeatures(feats);
+  const inputs = document.querySelectorAll('#feat-edit input');
+  if (inputs.length) inputs[inputs.length - 1].focus();
+}
+
+// ── Publish ────────────────────────────────────────────
+async function publish(liveNow) {
+  if (!currentData) return;
+  const title = document.getElementById('edit-title').value.trim();
+  const desc = document.getElementById('edit-desc').value.trim();
+  if (!title) { document.getElementById('publish-error').textContent = 'Vul een producttitel in.'; document.getElementById('publish-error').style.display = 'block'; return; }
+  document.getElementById('publish-error').style.display = 'none';
+
+  const badge = document.getElementById('edit-badge').value.trim();
+  const payload = {
+    aliexpress_url: currentData.aliexpress_url,
+    aliexpress_id: currentData.aliexpress_id,
+    title_nl: title,
+    description_nl: desc,
+    features: getFeatures(),
+    price: currentData.selling_price,
+    original_price: currentData.original_price || null,
+    supplier_cost: currentData.supplier_cost || null,
+    images: allImages,
+    category: document.getElementById('edit-cat').value,
+    badge: badge || null,
+    badge_class: badge && (badge.includes('NIEUW') || badge.toLowerCase().includes('new')) ? 'new' : '',
+    rating: currentData.rating || null,
+    orders_count: currentData.orders_count || 0,
+    ship_days: document.getElementById('edit-ship').value,
+    is_active: liveNow,
+  };
+
+  try {
+    const res = await fetch('/api/listing/publish', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || 'Publiceren mislukt');
+    document.getElementById('preview-wrap').style.display = 'none';
+    document.getElementById('success-wrap').style.display = 'block';
+    document.getElementById('success-msg').textContent = liveNow
+      ? 'Het product is direct live in de store. Klanten kunnen het nu bestellen.'
+      : 'Het product staat opgeslagen als concept. Ga naar de admin om het te publiceren.';
+  } catch (e) {
+    document.getElementById('publish-error').textContent = 'Fout: ' + e.message;
+    document.getElementById('publish-error').style.display = 'block';
+  }
+}
+
+function resetForm() {
+  currentData = null; allImages = [];
+  document.getElementById('ali-url').value = '';
+  document.getElementById('sell-price').value = '';
+  document.getElementById('orig-price').value = '';
+  document.getElementById('input-error').style.display = 'none';
+  ['ls-1','ls-2','ls-3','ls-4'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.className = 'loading-step'; el.querySelector('.step-icon').textContent = '⏳'; }
+  });
+  document.getElementById('step-input').style.display = 'block';
+  document.getElementById('loading-wrap').style.display = 'none';
+  document.getElementById('preview-wrap').style.display = 'none';
+  document.getElementById('success-wrap').style.display = 'none';
+  window.scrollTo({ top: 0 });
+}
+</script>
+</body>
+</html>

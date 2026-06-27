@@ -73,29 +73,36 @@ async def fetch_product_from_aliexpress(item_id: str) -> dict:
 
 def parse_supplier_price(item: dict) -> float:
     """Extract the supplier price from the nested AliExpress response."""
+    def clean_price(val) -> float:
+        """Convert any price value to a float, handling ranges like '2.68 - 17.38'."""
+        if not val:
+            return 0.0
+        s = str(val).replace(",", ".").strip()
+        # If it's a range, take the lower end
+        if " - " in s:
+            s = s.split(" - ")[0].strip()
+        try:
+            n = float(s.replace("€", "").replace("$", "").strip())
+            return n if n > 0 else 0.0
+        except (ValueError, AttributeError):
+            return 0.0
+
     sku = item.get("sku", {})
     if isinstance(sku, dict):
         def_sku = sku.get("def", {})
         for key in ["promotionPrice", "price", "salePrice"]:
             val = def_sku.get(key)
-            if val and float(str(val).replace(",", ".")) > 0:
-                try:
-                    return float(str(val).replace(",", "."))
-                except Exception:
-                    pass
+            result = clean_price(val)
+            if result > 0:
+                return result
 
     # Fallback: try top-level price fields
     for key in ["salePrice", "price", "promotionPrice", "minPrice"]:
-        val = item.get(key)
-        if val:
-            try:
-                n = float(str(val).replace(",", ".").replace("€", "").strip())
-                if n > 0:
-                    return n
-            except Exception:
-                pass
-    return 0.0
+        result = clean_price(item.get(key))
+        if result > 0:
+            return result
 
+    return 0.0
 
 def parse_images(item: dict) -> list:
     """Extract all product images, normalized to HTTPS full-res URLs."""

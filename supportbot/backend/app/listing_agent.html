@@ -171,13 +171,28 @@ h1{font-family:var(--serif);font-size:32px;margin-bottom:.4rem}
       <!-- Left: Images -->
       <div>
         <div class="card">
-          <div class="card-title">Afbeeldingen</div>
+          <div class="card-title">Afbeeldingen (<span id="img-count">0</span>)</div>
+
+          <!-- Main preview -->
           <div class="main-img-wrap">
-            <img id="prev-main-img" src="" alt=""/>
+            <img id="prev-main-img" src="" alt="" style="cursor:pointer"/>
           </div>
-          <div class="thumb-strip" id="prev-thumbs"></div>
-          <p style="font-size:11px;color:var(--slate);margin-top:.75rem">
-            <span id="img-count">0</span> afbeeldingen gevonden van AliExpress.
+
+          <!-- Editable image grid -->
+          <div id="img-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:8px"></div>
+
+          <!-- Add image by URL -->
+          <div style="margin-top:10px;display:flex;gap:7px">
+            <input id="add-img-url" placeholder="Plak een afbeeldings-URL om toe te voegen..."
+              style="flex:1;padding:8px 10px;border:1.5px solid var(--sand);border-radius:6px;font-size:12px;font-family:var(--sans);background:var(--bg);outline:none;transition:border-color var(--t)"
+              onkeydown="if(event.key==='Enter')addImageFromUrl()"
+              onfocus="this.style.borderColor='var(--black)'" onblur="this.style.borderColor='var(--sand)'"/>
+            <button onclick="addImageFromUrl()"
+              style="padding:8px 13px;background:var(--black);color:var(--white);border:none;border-radius:6px;font-size:12px;cursor:pointer;font-weight:500;white-space:nowrap;transition:background var(--t)"
+              onmouseover="this.style.background='#333'" onmouseout="this.style.background='var(--black)'">+ Toevoegen</button>
+          </div>
+          <p style="font-size:11px;color:var(--slate);margin-top:6px">
+            Klik op een foto om hem als hoofdafbeelding in te stellen. × om te verwijderen.
           </p>
         </div>
       </div>
@@ -389,14 +404,7 @@ function renderPreview(data) {
   currentImgIndex = 0;
 
   // Images
-  if (allImages.length) {
-    document.getElementById('prev-main-img').src = allImages[0];
-    document.getElementById('img-count').textContent = allImages.length;
-    document.getElementById('prev-thumbs').innerHTML = allImages.map((img, i) =>
-      `<div class="thumb ${i===0?'active':''}" onclick="setPreviewImg(${i})">
-        <img src="${img}" alt="" onerror="this.style.display='none'"/>
-      </div>`).join('');
-  }
+  renderImageGrid();
 
   // Margin
   const cost = data.supplier_cost || 0;
@@ -430,12 +438,58 @@ function renderPreview(data) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-function setPreviewImg(idx) {
-  currentImgIndex = idx;
-  document.getElementById('prev-main-img').src = allImages[idx];
-  document.querySelectorAll('#prev-thumbs .thumb').forEach((t, i) => {
-    t.classList.toggle('active', i === idx);
-  });
+function renderImageGrid() {
+  document.getElementById('img-count').textContent = allImages.length;
+  const mainEl = document.getElementById('prev-main-img');
+  const grid = document.getElementById('img-grid');
+
+  if (!allImages.length) {
+    mainEl.src = '';
+    grid.innerHTML = '<p style="color:var(--slate);font-size:12px;grid-column:1/-1;padding:4px 0">Geen afbeeldingen. Voeg er een toe via de URL hieronder.</p>';
+    return;
+  }
+
+  // Main preview always shows first image
+  mainEl.src = allImages[0];
+
+  grid.innerHTML = allImages.map((img, i) => `
+    <div style="position:relative;aspect-ratio:1;border-radius:7px;overflow:hidden;
+         border:2px solid ${i===0?'var(--black)':'var(--sand)'};cursor:pointer;transition:border-color .15s"
+         onclick="setMainImage(${i})"
+         onmouseover="this.style.borderColor='var(--black)'"
+         onmouseout="this.style.borderColor='${i===0?'var(--black)':'var(--sand)'}'"
+    >
+      <img src="${img}" style="width:100%;height:100%;object-fit:cover;display:block"
+           onerror="this.parentElement.style.opacity='.35'"/>
+      ${i===0 ? '<div style="position:absolute;top:4px;left:4px;background:var(--black);color:#fff;font-size:9px;padding:2px 5px;border-radius:3px;font-family:monospace;letter-spacing:.3px">HOOFD</div>' : ''}
+      <button onclick="event.stopPropagation();deleteImage(${i})"
+        style="position:absolute;top:4px;right:4px;width:20px;height:20px;background:rgba(220,38,38,.85);color:#fff;border:none;border-radius:50%;font-size:13px;cursor:pointer;line-height:1;display:flex;align-items:center;justify-content:center;font-weight:700">×</button>
+    </div>`).join('');
+}
+
+function setMainImage(i) {
+  if (i === 0) return;
+  const moved = allImages.splice(i, 1)[0];
+  allImages.unshift(moved);
+  renderImageGrid();
+  toast('✓ Hoofdafbeelding ingesteld');
+}
+
+function deleteImage(i) {
+  allImages.splice(i, 1);
+  renderImageGrid();
+  toast('Afbeelding verwijderd');
+}
+
+function addImageFromUrl() {
+  const input = document.getElementById('add-img-url');
+  const url = input.value.trim();
+  if (!url) return;
+  if (!url.startsWith('http')) { toast('⚠️ URL moet beginnen met https://'); return; }
+  allImages.push(url);
+  input.value = '';
+  renderImageGrid();
+  toast('✓ Afbeelding toegevoegd');
 }
 
 function updateTitleChars() {
